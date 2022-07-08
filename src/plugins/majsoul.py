@@ -38,7 +38,7 @@ mjxp = on_command('mjxp', aliases={'麻将性癖'})
 async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     xp = random.randint(0,35)
-    s = f"▾ To {nickname} | 麻将癖好\n你今天打麻将的癖好是做{maj_list[xp]}! 不满意的话再随一个吧。"
+    s = f"▾ [Sender: {nickname}]\n  麻将癖好\n你今天打麻将的癖好是做{maj_list[xp]}! 不满意的话再随一个吧。"
     await mjxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
@@ -66,7 +66,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(36):
         maj_value.append(h & 3)
         h >>= 2
-    s = f"▾ T‍o {nickname} | 运势 - 雀魂版\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
+    s = f"▾ [Sender: {nickname}]\n  雀魂运势板\n⏲️ | {now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n"
     s += f"\n★ 一姬之签 | Drawing\n---------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"大和率: {luck}%"

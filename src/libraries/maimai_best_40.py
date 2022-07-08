@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import total_list
 from src import static
 
+
 scoreRank = 'D C B BB BBB A AA AAA S S+ SS SS+ SSS SSS+'.lower().split(' ')
 combo = ' FC FC+ AP AP+'.split(' ')
 diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
@@ -94,7 +95,7 @@ class BestList(object):
 
 class DrawBest(object):
 
-    def __init__(self, sdBest: BestList, dxBest: BestList, userName: str, playerRating: int, musicRating: int, qqId: int or str = None, b50: bool = False):
+    def __init__(self, sdBest: BestList, dxBest: BestList, userName: str, playerRating: int, musicRating: int, qqId: int or str = None, b50: bool = False, platenum: int or str = 0):
         self.sdBest = sdBest
         self.dxBest = dxBest
         self.userName = self._stringQ2B(userName)
@@ -110,6 +111,7 @@ class DrawBest(object):
                 self.playerRating += computeRa(sd.ds, sd.achievement, True)
             for dx in dxBest:
                 self.playerRating += computeRa(dx.ds, dx.achievement, True)
+        self.platenum = platenum
         self.pic_dir = 'src/static/mai/pic/'
         self.cover_dir = 'src/static/mai/cover/'
         if self.b50:
@@ -320,6 +322,8 @@ class DrawBest(object):
             j = num % 5
             chartInfo = sdBest[num]
             pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.jpg')
+            if not os.path.exists(pngPath):
+                pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.png')
             if not os.path.exists(pngPath):
                 pngPath = os.path.join(self.cover_dir, '1000.png')
             temp = Image.open(pngPath).convert('RGB')
@@ -585,6 +589,12 @@ class DrawBest(object):
         self.img.paste(rightImg, (738, 780 if not self.b50 else 1080), mask=rightImg.split()[3])
 
         if self.qqId:
+            if self.platenum == 0:
+                plateImg = Image.open(os.path.join(self.pic_dir, 'none.png')).convert('RGBA')
+            else:
+                plateImg = Image.open(os.path.join(self.pic_dir, f'plate_{self.platenum}.png')).convert('RGBA')
+            plateImg = self._resizePic(plateImg, 2)
+            self.img.paste(plateImg, (9, 8), mask=plateImg.split()[3])
             resp = requests.get(f'http://q1.qlogo.cn/g?b=qq&nk={self.qqId}&s=100')
             qqLogo = Image.open(BytesIO(resp.content))
             borderImg1 = Image.fromarray(np.zeros((200, 200, 4), dtype=np.uint8)).convert('RGBA')
@@ -595,16 +605,16 @@ class DrawBest(object):
             borderImg = borderImg1.resize((108, 108))
             borderImg.paste(qqLogo, (4, 4))
             borderImg = self._resizePic(borderImg, 0.995)
-            self.img.paste(borderImg, (9, 15), mask=borderImg.split()[3])
+            self.img.paste(borderImg, (17, 17), mask=borderImg.split()[3])
         else:
             splashLogo = Image.open(os.path.join(self.pic_dir, 'UI_CMN_TabTitle_MaimaiTitle_Ver214.png')).convert('RGBA')
             splashLogo = self._resizePic(splashLogo, 0.65)
-            self.img.paste(splashLogo, (10, 33), mask=splashLogo.split()[3])
+            self.img.paste(splashLogo, (10, 35), mask=splashLogo.split()[3])
 
         ratingBaseImg = Image.open(os.path.join(self.pic_dir, self._findRaPic())).convert('RGBA')
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.8)
-        self.img.paste(ratingBaseImg, (240 if not self.qqId else 131, 10), mask=ratingBaseImg.split()[3])
+        self.img.paste(ratingBaseImg, (240 if not self.qqId else 139, 10), mask=ratingBaseImg.split()[3])
 
         namePlateImg = Image.open(os.path.join(self.pic_dir, 'UI_TST_PlateMask.png')).convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
@@ -614,7 +624,7 @@ class DrawBest(object):
         nameDxImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Name_DX.png')).convert('RGBA')
         nameDxImg = self._resizePic(nameDxImg, 0.9)
         namePlateImg.paste(nameDxImg, (230, 4), mask=nameDxImg.split()[3])
-        self.img.paste(namePlateImg, (240 if not self.qqId else 131, 50), mask=namePlateImg.split()[3])
+        self.img.paste(namePlateImg, (240 if not self.qqId else 139, 52), mask=namePlateImg.split()[3])
 
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
@@ -627,7 +637,7 @@ class DrawBest(object):
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
         shougouDraw.text(textPos, playCountInfo, (104, 186, 255), font2)
         shougouImg = self._resizePic(shougouImg, 1.05)
-        self.img.paste(shougouImg, (240 if not self.qqId else 131, 93), mask=shougouImg.split()[3])
+        self.img.paste(shougouImg, (240 if not self.qqId else 139, 95), mask=shougouImg.split()[3])
         
         splashImg = Image.open(os.path.join(self.pic_dir, 'Splash.png')).convert('RGBA')
         splashImg = self._resizePic(splashImg, 0.2)
@@ -698,7 +708,7 @@ async def get_player_data(payload: Dict):
         return player_data, 0
 
 
-async def generate(payload: Dict) -> (Optional[Image.Image], bool):
+async def generate(payload: Dict, platenum: int or str) -> (Optional[Image.Image], bool):
     obj, success = await get_player_data(payload)
     if success != 0: return None, success
     qqId = None
@@ -718,5 +728,5 @@ async def generate(payload: Dict) -> (Optional[Image.Image], bool):
         sd_best.push(ChartInfo.from_json(c))
     for c in dx:
         dx_best.push(ChartInfo.from_json(c))
-    pic = DrawBest(sd_best, dx_best, obj["nickname"], obj["rating"] + obj["additional_rating"], obj["rating"], qqId, b50).getDir()
+    pic = DrawBest(sd_best, dx_best, obj["nickname"], obj["rating"] + obj["additional_rating"], obj["rating"], qqId, b50, platenum).getDir()
     return pic, 0

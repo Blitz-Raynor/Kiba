@@ -1,4 +1,5 @@
 from collections import defaultdict
+from tkinter import Image
 
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
@@ -16,7 +17,9 @@ from src.libraries.maimai_plate import *
 import re
 import datetime
 import time
-
+import math
+from io import BytesIO
+import os
 from src.libraries.maimaidx_guess import GuessObject
 from nonebot.permission import Permission
 from nonebot.log import logger
@@ -27,6 +30,7 @@ from urllib import parse
 import asyncio
 from nonebot.rule import to_me
 from src.libraries.config import Config
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 driver = get_driver()
 
@@ -87,7 +91,11 @@ b40 / b50                                                                       
 
 底分分析/rating分析 <用户名>                                           Best 40 的底分分析
 
-早/[上午/中午/晚上]好/签到                                                             进行一波签到，然后可以得到今天的运势歌曲。
+/kiba 早 
+/kiba [上午/中午/晚上]好                                                             进行一波签到，然后可以得到今天的运势歌曲。                                          
+签到
+
+setplate                                                                                        更改在您自主查询B40/B50时在姓名框显示的牌子。
 ------------------------------------------------------------------------------------------------------------------------------
 
 ▼ 管理员设置 | Administrative                                             
@@ -104,17 +112,32 @@ b40 / b50                                                                       
     }]))
 
 def song_txt(music: Music):
+    try:
+        fileimage = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
+    except:
+        try:
+            fileimage = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.png")
+            imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
+        except:
+            try:
+                fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.jpg"))
+            except:
+                try:
+                    fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.png"))
+                except:
+                    fileimage = Image.open(os.path.join('src/static/mai/pic/', f"noimage.png"))
     return Message([
         {
             "type": "image",
             "data": {
-                "file": f"https://www.diving-fish.com/covers/{music.id}.jpg"
+                "file":  f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
             }
         },
         {
             "type": "text",
             "data": {
-                "text": f"♪ {music.id} ({music.type})\n"
+                "text": f"♪{music.type} - {music.id}\n"
             }
         },
         {
@@ -151,15 +174,16 @@ inner_level = on_command('inner_level ', aliases={'定数查歌 '})
 @inner_level.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
+    nickname = event.sender.nickname
     if len(argv) > 2 or len(argv) == 0:
         await inner_level.finish("命令格式为\n定数查歌 <定数>\n定数查歌 <定数下限> <定数上限>")
         return
     if len(argv) == 1:
         result_set = inner_level_q(float(argv[0]))
-        s = f"▾ 定数查歌结果 定数: {float(argv[0])}"
+        s = f"▾ [Sender: {nickname}]\n Search Result | 查歌 定数: {float(argv[0])}"
     else:
         result_set = inner_level_q(float(argv[0]), float(argv[1]))
-        s = f"▾ 定数查歌结果 定数: {float(argv[0])} - {float(argv[1])}"
+        s = f"▾ [Sender: {nickname}]\n Search Result | 查歌 定数: {float(argv[0])} - {float(argv[1])}"
     if len(result_set) > 50:
         await inner_level.finish(f"结果过多（{len(result_set)} 条），请缩小搜索范围。")
         return
@@ -195,7 +219,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(music_data) == 0:
             rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？'
         else:
-            rand_result = f'▾ To {nickname} | Rand Track\n' + song_txt(music_data.random())
+            rand_result = f'▾ [Sender: {nickname}]\n  Rand Track | 随机歌曲\n' + song_txt(music_data.random())
             if level == '15':
                 rand_result += "\n\nPandora:\n" + pandora_list[random.randint(0,7)]
         await spec_rand.send(rand_result)
@@ -226,10 +250,10 @@ async def _(bot: Bot, event: Event, state: T_State):
             await spec_rand_multi.send(rand_result)
         else:
             if res.groups()[3] == '15' and res.groups()[4] is None:
-                rand_result = f'▿ Rand Tracks Error | Lv 15\nWDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 834 去！！'
+                rand_result = f'▿ [Sender: {nickname}]\n  Rand Tracks Error | Lv 15\nWDNMD....{res.groups()[0]}首白潘是吧？\n(╯‵□′)╯︵┻━┻\n 自己查 834 去！！'
                 await spec_rand_multi.send(rand_result)
             else:
-                rand_result = f'▾ To {nickname} | Rand Tracks\n'
+                rand_result = f'▾ [Sender: {nickname}]\n  Multi Rand Tracks | 多曲随机\n'
                 for i in range(int(res.groups()[0])):
                     if res.groups()[1] == "dx":
                         tp = ["DX"]
@@ -246,7 +270,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     else:
                         music_data = total_list.filter(level=level, diff=['绿黄红紫白'.index(res.groups()[2])], type=tp)
                     if len(music_data) == 0:
-                        rand_result = f'{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣)'
+                        rand_result = f'▿ [Sender: {nickname}]\n  Rand Tracks Error | Lv Error\n{nickname}，最低是1，最高是15，您这整了个{level}......故意找茬的吧？\n <(* ￣︿￣)'
                     else:
                         rand_result += f'\n----- Track {i + 1} / {res.groups()[0]} -----\n' + song_txt(music_data.random())
                 await spec_rand_multi.send(rand_result)
@@ -284,11 +308,39 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
 
+def getCharWidth(o) -> int:
+        widths = [
+            (126, 1), (159, 0), (687, 1), (710, 0), (711, 1), (727, 0), (733, 1), (879, 0), (1154, 1), (1161, 0),
+            (4347, 1), (4447, 2), (7467, 1), (7521, 0), (8369, 1), (8426, 0), (9000, 1), (9002, 2), (11021, 1),
+            (12350, 2), (12351, 1), (12438, 2), (12442, 0), (19893, 2), (19967, 1), (55203, 2), (63743, 1),
+            (64106, 2), (65039, 1), (65059, 0), (65131, 2), (65279, 1), (65376, 2), (65500, 1), (65510, 2),
+            (120831, 1), (262141, 2), (1114109, 1),
+        ]
+        if o == 0xe or o == 0xf:
+            return 0
+        for num, wid in widths:
+            if o <= num:
+                return wid
+        return 1
+def coloumWidth(s: str):
+    res = 0
+    for ch in s:
+        res += getCharWidth(ord(ch))
+    return res
+def changeColumnWidth(s: str, len: int) -> str:
+     res = 0
+     sList = []
+     for ch in s:
+         res += getCharWidth(ord(ch))
+         if res <= len:
+            sList.append(ch)
+     return ''.join(sList)
 
 @query_chart.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     regex = "([绿黄红紫白]?)id([0-9]+)"
     groups = re.match(regex, str(event.get_message())).groups()
+    nickname = event.sender.nickname
     level_labels = ['绿', '黄', '红', '紫', '白']
     if groups[0] != "":
         try:
@@ -300,56 +352,117 @@ async def _(bot: Bot, event: Event, state: T_State):
             ds = music['ds'][level_index]
             level = music['level'][level_index]
             stats = music['stats'][level_index]
+            pic_dir = 'src/static/mai/pic/'         
+            baseimage =  Image.open(os.path.join(pic_dir, f'levelid.png')).convert('RGBA')
+            if level_index == 0:
+                pic= 'BSC'
+            elif level_index == 1:
+                pic = 'ADV'
+            elif level_index == 2:
+                pic = 'EXP'
+            elif level_index == 3:
+                pic = 'MST'
+            else:
+                pic = 'MST_Re'
+            image = Image.open(os.path.join(pic_dir, f'1{pic}.png')).convert('RGBA')
+            image = image.resize((int(image.size[0] * 1), int(image.size[1] * 1)))
             try:
                 tag = stats['tag']
             except:
                 tag = "Insufficient Difficulty Data"
-            file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
-            if len(chart['notes']) == 4:
-                msg = f'''------ {level_name[level_index]} ------
-Lv {level} ▸ {ds} | {tag}
-Note Designer: {chart['charter']}
-Notes Details:
-All Notes: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3]}
-Tap: {chart['notes'][0]} | Hold: {chart['notes'][1]} | Slide: {chart['notes'][2]}
-Touch: -- | Break: {chart['notes'][3]}'''
+            try:
+                file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+                imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
+                imagedata = imagedata.resize((int(600), int(600)))
+            except:
+                try:
+                    pic_cover = 'src/static/mai/cover/'
+                    try:
+                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+                    except:
+                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+                    imagedata = imagedata.resize((int(600), int(600)))
+                except:
+                    imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
+            if pic == 'MST_Re':
+                imagedata.paste(image, (8,8), mask=image.split()[3])
             else:
-                msg = f'''------ {level_name[level_index]} ------
-Lv {level} ▸ {ds} | {tag}
-Note Designer: {chart['charter']}
-Notes Details:
-All Notes: {chart['notes'][0] + chart['notes'][1] + chart['notes'][2] + chart['notes'][3] + chart['notes'][4]}
-Tap: {chart['notes'][0]} | Hold: {chart['notes'][1]} | Slide: {chart['notes'][2]}
-Touch: {chart['notes'][3]} | Break: {chart['notes'][4]}'''
+                imagedata.paste(image, (5,8), mask=image.split()[3])
+            baseimage.paste(imagedata, (0,0), mask=imagedata.split()[3])
+            font = ImageFont.truetype('src/static/HOS.ttf', 19, encoding='utf-8')
+            fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
+            fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 28, encoding='utf-8')
+            fontLV = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
+            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 12, encoding='utf-8')
+            imageDraw = ImageDraw.Draw(baseimage);
+            if len(chart['notes']) == 4:
+                imagestandard = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
+                imagestandard = imagestandard.resize((int(imagestandard.size[0] * 0.8), int(imagestandard.size[1] * 0.8)))
+                baseimage.paste(imagestandard, (480,26), mask=imagestandard.split()[3])
+                imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
+                if coloumWidth(music["title"]) > 40:
+                    title = changeColumnWidth(music["title"], 11) + '...'
+                    imageDraw.text((33, 680), title, 'black', fontBoldL)
+                else:
+                    imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
+                if str(level).rfind("+") == -1:
+                    imageDraw.text((513, 635), f'{level}', 'white', fontLV)
+                else:
+                    imageDraw.text((505, 635), f'{level}', 'white', fontLV)
+                imageDraw.text((523, 690), f'{ds}', (0, 162, 232), fontBoldLV)
+                imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
+                imageDraw.text((35, 831), f'{tag}', 'black', font)
+                imageDraw.text((35, 930), f'{chart["charter"]}', 'black', font)
+                tap = chart['notes'][0]
+                hold = chart['notes'][1]
+                slide = chart['notes'][2]
+                breaknote = chart['notes'][3]
+                imageDraw.text((68, 1092), f'{tap}', 'white', fontLV)
+                imageDraw.text((236, 1092), f'{slide}', 'white', fontLV)
+                imageDraw.text((433, 1092), f'--', 'white', fontLV)
+                imageDraw.text((68, 1215), f'{hold}', 'white', fontLV)
+                imageDraw.text((236, 1215), f'{breaknote}', 'white', fontLV)
+                imageDraw.text((433, 1215), f'{tap + slide + hold + breaknote}', 'white', fontLV)
+            else:
+                imagedx = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
+                imagedx = imagedx.resize((int(imagedx.size[0] * 0.8), int(imagedx.size[1] * 0.8)))
+                baseimage.paste(imagedx, (480,26), mask=imagedx.split()[3])
+                imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
+                if coloumWidth(music["title"]) > 40:
+                    title = changeColumnWidth(music["title"], 11) + '...'
+                    imageDraw.text((33, 680), title, 'black', fontBoldL)
+                else:
+                    imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
+                if str(level).rfind("+") == -1:
+                    imageDraw.text((513, 635), f'{level}', 'white', fontLV)
+                else:
+                    imageDraw.text((501, 635), f'{level}', 'white', fontLV)
+                imageDraw.text((523, 690), f'{ds}', (0, 162, 232), fontBoldLV)
+                imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
+                imageDraw.text((35, 831), f'{tag}', 'black', font)
+                imageDraw.text((35, 930), f'{chart["charter"]}', 'black', font)
+                tap = chart['notes'][0]
+                hold = chart['notes'][1]
+                slide = chart['notes'][2]
+                touch = chart['notes'][3]
+                breaknote = chart['notes'][4]
+                imageDraw.text((68, 1092), f'{tap}', 'white', fontLV)
+                imageDraw.text((236, 1092), f'{slide}', 'white', fontLV)
+                imageDraw.text((433, 1092), f'{touch}', 'white', fontLV)
+                imageDraw.text((68, 1215), f'{hold}', 'white', fontLV)
+                imageDraw.text((236, 1215), f'{breaknote}', 'white', fontLV)
+                imageDraw.text((433, 1215), f'{tap + slide + hold + breaknote + touch}', 'white', fontLV)
             await query_chart.send(Message([
                 {
                     "type": "text",
                     "data": {
-                        "text": f"▾ 谱面详细信息\n"
+                        "text": f"▾ [Sender: {nickname}]\n  Details - {music['title']}\n"
                     }
                 },
                 {
                     "type": "image",
                     "data": {
-                        "file": f"{file}"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"♪ {music['id']} ({music['type']})\n"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"{music['title']}\n"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": msg
+                        "file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"
                     }
                 }
             ]))
@@ -359,43 +472,64 @@ Touch: {chart['notes'][3]} | Break: {chart['notes'][4]}'''
         name = groups[1]
         music = total_list.by_id(name)
         try:
+            pic_dir = 'src/static/mai/pic/'         
+            baseimage = Image.open(os.path.join(pic_dir, f'id.png')).convert('RGBA')
+            try:
+                file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+                imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
+                imagedata = imagedata.resize((int(600), int(600)))
+            except:
+                try:
+                    pic_cover = 'src/static/mai/cover/'
+                    try:
+                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+                    except:
+                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+                    imagedata = imagedata.resize((int(600), int(600)))
+                except:
+                    imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
+            baseimage.paste(imagedata, (0,0), mask=imagedata.split()[3])
+            font = ImageFont.truetype('src/static/HOS.ttf', 19, encoding='utf-8')
+            fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
+            fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 28, encoding='utf-8')
+            fontLV = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
+            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
+            fontTools = ImageFont.truetype('src/static/adobe_simhei.otf', 20, encoding='utf-8')
+            imageDraw = ImageDraw.Draw(baseimage);
+            imageDraw.text((70, 618), f'{music["id"]}', 'white', fontBold)
+            if coloumWidth(music["title"]) > 40:
+                title = changeColumnWidth(music["title"], 11) + '...'
+                imageDraw.text((33, 660), title, 'black', fontBoldL)
+            else:
+                imageDraw.text((33, 660), f'{music["title"]}', 'black', fontBoldL)
+            if int(music["basic_info"]["bpm"]) >= 100:
+                imageDraw.text((511, 637), f'{music["basic_info"]["bpm"]}', 'black', fontLV)
+            else:
+                imageDraw.text((508, 637), f' {music["basic_info"]["bpm"]}', 'black', fontLV)
+            imageDraw.text((37, 705), f'{music["basic_info"]["artist"]}', 'black', font)
+            imageDraw.text((44, 810), f'{music["basic_info"]["genre"]}', 'black', font)
+            imageDraw.text((44, 903), f'{music["basic_info"]["from"]}', 'black', font)
+            imageDraw.text((56, 1088), f'{"  -  ".join(music["level"])}', 'white', fontLV)
+            imageDraw.text((56, 1205), f'{" - ".join(str(music["ds"]).split(","))}', 'white', fontBoldLV)
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             await query_chart.send(Message([
                 {
                     "type": "text",
                     "data": {
-                        "text": f"▾ 歌曲详细信息\n"
+                        "text": f"▾ [Sender: {nickname}]\n  Music Details - {music['title']}\n"
                     }
                 },
                 {
                     "type": "image",
                     "data": {
-                        "file": f"{file}"
-                    }
-                },
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"♪ {music['id']} ({music['type']})\n"
-                    }
-                }, 
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"{music['title']}\n"
-                    }
-                },  
-                {
-                    "type": "text",
-                    "data": {
-                        "text": f"艺术家: {music['basic_info']['artist']}\n分类: {music['basic_info']['genre']}\nBPM: {music['basic_info']['bpm']}\n版本: {music['basic_info']['from']}\n等级 [当前版本定数]:\n{' ▸ '.join(music['level'])}\n{' ▸'.join(str(music['ds']).split(','))}"
+                        "file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"
                     }
                 }
             ]))
         except Exception as e:
             await query_chart.send(f"▿ 无匹配乐曲\n啊这...我没有找到这个歌。\n换一个试试吧。\n[Exception Occurred]\n{e}")
 
-xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)']
+xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)', '大司马', '电棍', '海子姐', '东雪莲', 'GIAO', '去沈阳大街', '一眼丁真', '陈睿']
 
 jrxp = on_command('jrxp', aliases={'今日性癖'})
 
@@ -406,8 +540,8 @@ async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     h = hash(qq)
     rp = h % 100
-    xp = random.randint(0,24)
-    s = f"▾ 今日性癖\n{nickname}今天的性癖是{xp_list[xp]}，人品值是{rp}%.\n不满意的话再随一个吧！"
+    xp = random.randint(0,32)
+    s = f"▾ [Sender: {nickname}]\n  今日性癖\n{nickname}今天的性癖是{xp_list[xp]}，人品值是{rp}%.\n不满意的话再随一个吧！"
     await jrxp.finish(Message([
         {"type": "text", "data": {"text": s}}
     ]))
@@ -442,28 +576,28 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(14):
         wm_value.append(h & 3)
         h >>= 2
-    s = f"▾ To {nickname} | 运势\n◢ 时间\n{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n\n"
-    s += f"◢ 占卜\n---------------------\n"
+    s = f"▾ [Sender: {nickname}]\n  Fortune | 运势黑板\n◢ 查询时间\n{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n\n"
+    s += f"◢ 占卜板\n---------------------\n"
     if rp >= 50 and rp < 70 or rp >= 70 and rp < 90 and luck < 60:
-        s += "末吉: 稍微有那么一点小幸运！"
+        s += "末吉: 有那么一点小幸运，打maimai吃了几分，不亏不亏~"
     elif rp >= 70 and rp < 90 and luck >= 60 or rp >= 90 and luck < 80:
-        s += "吉: 好运连连，挡都挡不住~"
+        s += "吉: 今天各种顺利，是轻松满足的一天捏！"
     elif rp >= 90 and luck >= 80:
-        s += "大吉: 干点什么都会有惊喜发生！"
+        s += "大吉: 我的天呐~在线蹲个办法让我水逆一次啊！！"
     elif rp >= 10 and rp < 30 and luck < 40:
-        s += "凶: emm...粉了一串纵连。"
+        s += "凶: emm...粉了一串纵连。好嘛，有什么问题吗，没问题啦~"
     elif rp < 10 and luck < 10:
-        s += "大凶: 今天稍微有点倒霉捏。"
+        s += "大凶: 今天稍微有点倒霉捏。只要能苟，问题就不大~"
     else:
-        s += "小凶: 有那么一丢丢的坏运气，不过不用担心捏。"
+        s += "小凶: 有那么一丢丢的坏运气，不过不用担心捏。莫得问题~"
     s += f"\n---------------------\n人品值: {rp}%  |  幸运值: {luck}%\n"
-    s += f"\n◢ 运势概览\n"
+    s += f"\n今日出勤运势概览：\n"
     if dwm_value_1 == dwm_value_2:
         s += f'平 ▷ 今天总体上平平无常。向北走有财运，向南走运不佳....等一下，这句话好像在哪儿听过？\n'
     else:
         s += f'宜 ▷ {bwm_list_perfect[dwm_value_1]}\n'
         s += f'忌 ▷ {bwm_list_bad[dwm_value_2]}\n'
-    s += f"\n◢ 舞萌运势\n收歌指数: {ap}%\n最佳朝向: {fx_list[random.randint(0, 3)]}\n最佳游戏位置: {play_list[random.randint(0, 2)]}\n"
+    s += f"\n◢ 推歌板\n收歌指数: {ap}%\n最佳朝向: {fx_list[random.randint(0, 3)]}\n最佳游戏位置: {play_list[random.randint(0, 2)]}\n"
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i
@@ -472,21 +606,34 @@ async def _(bot: Bot, event: Event, state: T_State):
             bad_value[bad_count] = i
             bad_count = bad_count + 1
     if good_count == 0:
-        s += "宜 ▷ 诸事不宜"
+        s += "今天没有任何适合做的事情...诸事不宜，小心破防..."
     else:
-        s += f'宜 ▷ 共 {good_count} 项:\n'
+        s += f'出勤宜做以下 {good_count} 项事:\n'
         for i in range(good_count):
             s += f'{wm_list[good_value[i]]} '
     if bad_count == 0:
-        s += '\n忌 ▷ 无所畏忌\n'
+        s += '\n今天诸事顺利！没有不建议做的事情捏~\n'
     else:
-        s += f'\n忌 ▷ 共 {bad_count} 项:\n'
+        s += f'\n今天不应做以下 {bad_count} 项事:\n'
         for i in range(bad_count):
             s += f'{wm_list[bad_value[i]]} '
-    s += f'\n\n◢ 犽的锦囊 - 运势版\nKiba 提示:\n{tips_list[tips_value]}\n'
-    s += "今日运势 - 锦囊推荐:\n"
+    s += f'\n\n◢ 运势板\n有一些 Tips:\n{tips_list[tips_value]}\n'
+    s += "运势锦囊:\n"
     music = total_list[hash(qq) * now.day * now.month % len(total_list)]
     await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
+
+
+randomthings = ['推分成功！！正当你兴奋之余，突然机厅断电了。', '你心血来潮打HERA，绿了两串纵连之后转身掏出了筋膜枪。','你打花一轮的时候，后面传来了:"铸币吧打野走位，像那B三狼。" 看来你要与OTTO一起出勤了。', 'STOP Playing MAIMAI', '最心心念念的歌曲推分成功啦！']
+cqmn = on_command("出勤模拟")
+@cqmn.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    nickname = event.sender.nickname
+    now = datetime.datetime.now()
+    qq = int(event.get_user_id())
+    randomid = random.randint(0,4)
+    s = f"▾ [Sender: {nickname}]\n  Attend-Simulator | 出勤模拟器\n您今天出勤的随机事件:\n{randomthings[randomid]}\n你今天必可以推成功的歌曲:\n"
+    music = total_list[hash(qq) * now.day * now.month % len(total_list)]
+    await cqmn.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
 
 jrrp = on_command('jrrp', aliases={'人品值'})
 
@@ -498,7 +645,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     rp = h % 100
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
-    s = f"▾ To {nickname} | 人品签\n----------------------\n"
+    s = f"▾ [Sender: {nickname}]\n Character | 人品签\n----------------------\n"
     s += f"人品值: {rp}%\n"
     s += f"幸运度: {luck}%"
     if rp >= 50 and rp < 70 or rp >= 70 and rp < 90 and luck < 60:
@@ -518,7 +665,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         {"type": "text", "data": {"text": s}}
     ]))
 
-jrgq = on_command('早', aliases={'签到', '晚上好', '上午好', '下午好', '中午好'})
+jrgq = on_command('/kiba 早', aliases={'签到', '/kiba 晚上好', '/kiba 上午好', '/kiba 下午好', '/kiba 中午好'})
 
 @jrgq.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -533,7 +680,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await c.execute(f'select * from gld_table where uid="{event.user_id}"')
         data = await c.fetchone()
         if data is None:
-            await jrgq.send(f"▿ To {nickname} | 签到 - 错误\n在频道内，签到前需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+            await jrgq.send(f"▿ [Sender: {nickname}]\n  Sign-in Error | 签到 - 错误\n在频道内，签到前需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
             return
         else:
             qq = int(data[0])
@@ -559,10 +706,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                     await c.execute(f'insert into sign_table values ({len(data3) + 1}, {qq}, {day})')
                     sign = len(data3) + 1
             else:
-                await jrgq.finish(f"▿ To {nickname} | 签到 - 错误\n您貌似今天已经签过到啦！排名是第 {data2[0]} 位。")
+                await jrgq.finish(f"▿ [Sender: {nickname}]\n  Signed in | 已签到\n您貌似今天已经签过到啦！排名是第 {data2[0]} 位。")
                 return
     await db.commit()
-    s = f"▾ To {nickname} | 签到\n"
+    s = f"▾ [Sender: {nickname}]\n  Sign In | 签到\n"
     if hour < 6:
         s += "您起来的这么早吗？！还是熬夜啦......"
     elif hour >= 6 and hour < 9:
@@ -601,15 +748,15 @@ async def _(bot: Bot, event: Event, state: T_State):
     name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
     nickname = event.sender.nickname
     if name not in music_aliases:
-        await find_song.finish(f"▿ To {nickname} | 别名查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://kdocs.cn/l/cdzsTdqaPFye")
+        await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n但是您可以帮助我收集歌曲的别名！戳链接加入 Kiba 歌曲别名收集计划:\nhttps://docs.qq.com/form/page/DREJFWUtWektMSm9Y")
         return
     result_set = music_aliases[name]
     if len(result_set) == 1:
         music = total_list.by_title(result_set[0])
-        await find_song.finish(Message([{"type": "text", "data": {"text": f"▾ To {nickname} | 别名查歌\n您说的应该是：\n"}}] + song_txt(music)))
+        await find_song.finish(Message([{"type": "text", "data": {"text": f"▾ [Sender: {nickname}]\n  Search Result | 别名查歌结果\n您说的应该是：\n"}}] + song_txt(music)))
     else:
         s = '\n'.join(result_set)
-        await find_song.finish(f"▾ To {nickname} | 别名查歌 - 多个结果\n您要找的可能是以下歌曲中的其中一首：\n{ s }")
+        await find_song.finish(f"▾ [Sender: {nickname}]\n  Search Results | 多个别名查歌结果\n您要找的可能是以下歌曲中的其中一首：\n{ s }")
 
 
 query_score = on_command('分数线')
@@ -621,7 +768,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     argv = str(event.get_message()).strip().split(" ")
     nickname = event.sender.nickname
     if len(argv) == 1 and argv[0] == '帮助':
-        s = '''▾ 分数线 - 帮助
+        s = '''▾ Help for ACHV. Line 分数线 - 帮助
 这个功能为你提供达到某首歌分数线的最低标准而设计的~~~
 命令格式：分数线 <难度+歌曲id> <分数线>
 例如：分数线 紫799 100
@@ -660,10 +807,10 @@ BREAK\t5/12.5/25(外加200落)'''
             reduce = 101 - line
             if reduce <= 0 or reduce >= 101:
                 raise ValueError
-            await query_chart.send(f'''▾ To {nickname} | 分数线详情
-♪ {music['id']} ({music['type']}) | {level_labels2[level_index]}
-{music['title']}
-分数线 {line}% 参照表:
+            await query_chart.send(f'''▾ [Sender: {nickname}]\n  ACHV. Line | 分数线
+♪ {music['id']} ({music['type']})
+{music['title']} | {level_labels2[level_index]}
+设置的达成率为{line}%，其 Note 损失参照如下:
 ----------------------
 此表格遵循的格式为:
 类型 | ACHV.损失/个 | 最多损失数
@@ -683,7 +830,7 @@ Slide | {(10000 / total_score)* 15:.4f}% | {((total_score * reduce / 10000)/ 15)
 
 Break 各评价损失:
 注意: Break 的 Great 与 Perfect 评价都有细分等级，此表格的 Break Great 不做细分，仅为大约数供您参考。
-本谱面每个 Break Perfect 2600 的达成率是 {((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4):.4f}%,谱面共 {brk} 个 Break。
+本谱面每个 Break Perfect 2600 的达成率是 {((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4):.4f}%,谱面共 {brk} 个 Break，其占总体达成率的 {(((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4)* brk):.4f}%。
 ----------------------
 此表格遵循的格式为:
 类型 | ACHV.损失/个 | Tap Great 等价数
@@ -696,10 +843,40 @@ Miss | {((10000 / total_score) * 25 + (break_50_reduce / total_score * 100)* 4):
         except Exception:
             await query_chart.send("格式错误，输入 “分数线 帮助” 以查看帮助信息")
 
+setplate = on_command('设置牌子', aliases={'setplate', '更换名牌板'})
+@setplate.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    platenum = str(event.get_message()).strip()
+    nickname = event.sender.nickname
+    mt = event.message_type
+    db = get_driver().config.db
+    qq = str(event.get_user_id())
+    c = await db.cursor()
+    if mt == "guild":
+        await c.execute(f'select * from gld_table where uid="{event.user_id}"')
+        data = await c.fetchone()
+        if data is None:
+            await setplate.send(f"▿ [Sender: {nickname}]\n  Plate Changer Error | 错误\n在频道内，您需要绑定 QQ 才允许使用更换名牌版功能。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+            return
+        else:
+            qq = str(data[0])
+    if platenum == "":
+        await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n除将/极/神/舞舞牌子需要您查询一次清谱后自动为您更换外，您还可以使用‘setplate 对应数字’更换普通名牌板。\nKiba 当前收录的普通名牌板如下(持续更新):\n0.默认\n1.maimai でらっくす\n2.全国制霸 でらっくす\n3.はっぴー（ゆにばーす）\n4.东方Projectちほー\n5.炎炎ノ消防队ちほー\n6.でらっくすちほー おしゃま牛乳\n另外内置了一个彩蛋牌子，是 KING of Performai 3rd ファイナリスト，提示是“21、11、9”。")
+    elif int(platenum) < 0 and int(platenum) > 6 and int(platenum) != 1001:
+        await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n请输入正确的名牌板号码。")
+    else:
+        await c.execute(f'select * from plate_table where id="{qq}"')
+        data = await c.fetchone()
+        if data is None:
+            await c.execute(f'insert into plate_table values ({qq}, {platenum})')
+        else:
+            await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
+        await db.commit()
+        await setplate.finish(f"▾ [Sender: {nickname}]\n   Plate Changer | 更换名牌板\n更换完成。")
+    
+
 
 best_40_pic = on_command('b40', aliases={'B40'})
-
-
 @best_40_pic.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     username = str(event.get_message()).strip()
@@ -712,28 +889,41 @@ async def _(bot: Bot, event: Event, state: T_State):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await best_50_pic.send(f"▿ To {nickname} | Best 40 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
+                await c.execute(f'select * from plate_table where id="{str(data[0])}"')
+                data1 = await c.fetchone()
+                if data1 is None:
+                    platenum = 0
+                else:
+                    platenum = str(data1[1])
         else:
             payload = {'qq': str(event.get_user_id())}
+            await c.execute(f'select * from plate_table where id="{str(event.get_user_id())}"')
+            data1 = await c.fetchone()
+            if data1 is None:
+                platenum = 0
+            else:
+                platenum = str(data1[1])
     else:
         payload = {'username': username}
+        platenum = 0
     try:
-        img, success = await generate(payload)
+        img, success = await generate(payload, platenum)
     except Exception as e:
-        await best_40_pic.send(f"▿ To {nickname} | Best 40 - 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Exception | 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     if success == 400:
-        await best_40_pic.send(f"▿ To {nickname} | Best 40 - 错误\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Not Found | 找不到 ID\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_40_pic.send(f'▿ To {nickname} | Best 40 - 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await best_40_pic.send(f'▿ [Sender: {nickname}]\n  Best 40: Banned | 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         if username == "":
-            text = f'▾ To {nickname} | Best 40\n您的 Best 40 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | 我的 B40\n您的 Best 40 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'▾ To {nickname} | Best 40 - 其他 ID 查询\n您查询的 ID: {username} 已找到。此 ID 的 Best 40 如图所示。\n'
+            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | {username} 的 B40\n此 ID 的 Best 40 如图所示。\n'
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
@@ -754,29 +944,42 @@ async def _(bot: Bot, event: Event, state: T_State):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await best_50_pic.send(f"▿ To {nickname} | Best 50 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
+                await c.execute(f'select * from plate_table where id="{str(data[0])}"')
+                data1 = await c.fetchone()
+                if data1 is None:
+                    platenum = 0
+                else:
+                    platenum = str(data1[1])
         else:
             payload = {'qq': str(event.get_user_id())}
+            await c.execute(f'select * from plate_table where id="{str(event.get_user_id())}"')
+            data1 = await c.fetchone()
+            if data1 is None:
+                platenum = 0
+            else:
+                platenum = str(data1[1])
     else:
         payload = {'username': username}
+        platenum = 0
     payload['b50'] = True
     try:
-        img, success = await generate(payload)
+        img, success = await generate(payload, platenum)
     except Exception as e:
-        await best_50_pic.send(f"▿ To {nickname} | Best 50 - 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Exception | 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     if success == 400:
-        await best_50_pic.send(f"▿ To {nickname} | Best 50 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Not Found | 找不到 ID\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await best_50_pic.send(f'▿ To {nickname} | Best 50 - 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await best_50_pic.send(f'▿ [Sender: {nickname}]\n  Best 50: Banned | 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         if username == "":
-            text = f'▾ To {nickname} | Best 50\n您的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | 我的 B50\n您的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'▾ To {nickname} | Best 50 - 其他 ID 查询\n您查询的 ID: {username} 已找到。此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
+            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | {username} 的 B50\n此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
@@ -870,7 +1073,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if data is None:
             await c.execute(f'insert into guess_table values ({gid}, 1)')
         elif data[1] == 0:
-            await guess_music.send("▿ 猜歌 - 被禁用\n抱歉，本群的管理员设置已设置已禁用猜歌。")
+            await guess_music.send("▿ 猜歌 - 禁用\n抱歉啦，本群的管理员已禁用猜歌。")
             return
         if k in guess_dict:
             if k in guess_cd_dict and time.time() > guess_cd_dict[k] - 400:
@@ -1040,7 +1243,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if argv[0] == "帮助":
             rand_result = "▾ 段位模式 - 帮助\n命令是:\n段位模式 <Expert/Master> <初级/中级/上级/超上级*1> <计算> (<Great数量> <Good数量> <Miss数量> <剩余的血量*3>)*2\n* 注意:\n*1 超上级选项只对Master有效。\n*2 只有使用计算功能的时候才需要打出括号内要求的内容。注意如果您对应的 Great 或 Good 或 Miss 的数量是0，请打0。\n *3 您可以指定剩余的血量(Life)，如果您不指定血量，默认按满血计算。"
         else:
-            rand_result = f'▾ To {nickname} | Rank Mode\nRank: {argv[0]} {argv[1]}\n'
+            rand_result = f'▾ [Sender: {nickname}]\n  Rank Mode\nRank: {argv[0]} {argv[1]}\n'
             if argv[0] == "Expert" or argv[0] == "expert" or argv[0] == "EXPERT":
                 if argv[1] == "初级":
                     level = ['7', '8', '9']
@@ -1073,7 +1276,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     max = '12+'
                     msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若红、紫谱面难度相同，优先采用红谱。"
                 else:
-                    rand_ranking.send(f"▿ To {nickname} | Rank Error\n寄，Expert 等级只有初级、中级、上级！")
+                    rand_ranking.send(f"▿ [Sender: {nickname}]\n  Rank Error\n寄，Expert 等级只有初级、中级、上级！")
                     return
             elif argv[0] == "Master" or argv[0] == "master" or argv[0] == "MASTER":
                 if argv[1] == "初级":
@@ -1117,10 +1320,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                     max = 15.0
                     msg = "\n注意: 在难度选择时，请优先采用适合本段位的等级最高的难度，若紫、白谱面难度相同，优先采用紫谱。"
                 else:
-                    rand_ranking.send(f"▿ To {nickname} | Rank Error\n寄，Master 等级只有初级、中级、上级、超上级！")
+                    rand_ranking.send(f"▿ [Sender: {nickname}]\n  Rank Error\n寄，Master 等级只有初级、中级、上级、超上级！")
                     return
             else:
-                rand_ranking.send(f"▿ To {nickname} | Rank Error\n寄，大等级只有Master、Expert！")
+                rand_ranking.send(f"▿ [Sender: {nickname}]\n  Rank Error\n寄，大等级只有Master、Expert！")
                 return
             if len(argv) > 3 and argv[2] == "计算":
                 if len(argv) > 7:
@@ -1129,24 +1332,24 @@ async def _(bot: Bot, event: Event, state: T_State):
                     if len(argv) == 6:
                         mylife = life + (int(argv[3]) * gr) + (int(argv[4]) * gd) + (int(argv[5]) * miss)
                         if mylife <= 0:
-                            await rand_ranking.send(f"▿ To {nickname} | 段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
+                            await rand_ranking.send(f"▿ [Sender: {nickname}]\n  段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
                             return
                         else:
                             mylife += clear
                             if mylife > life:
                                 mylife = life
-                            await rand_ranking.send(f"▾ To {nickname} | 段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
+                            await rand_ranking.send(f"▾ [Sender: {nickname}]\n  段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
                             return
                     elif len(argv) == 7:
                         mylife = int(argv[6]) + (int(argv[3]) * gr) + (int(argv[4]) * gd) + (int(argv[5]) * miss)
                         if mylife <= 0:
-                            await rand_ranking.send(f"▿ To {nickname} | 段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
+                            await rand_ranking.send(f"▿ [Sender: {nickname}]\n  段位闯关失败\n寄，您的血量扣光了......{argv[0]} {argv[1]}段位不合格！")
                             return
                         else:
                             mylife += clear
                             if mylife > life:
                                 mylife = life
-                            await rand_ranking.send(f"▾ To {nickname} | 段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
+                            await rand_ranking.send(f"▾ [Sender: {nickname}]\n  段位血量\n您还剩余 {mylife} 血！如果没闯到第四首就请继续加油吧！")
                             return
                     else:
                         raise ValueError
@@ -1158,7 +1361,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                     rand_result += f'\n----- Track {i + 1} / 4 -----\n' + song_txt(music_data.random())
         await rand_ranking.send(rand_result)
     except Exception as e:
-        await rand_ranking.finish(f"▿ To {nickname} | Rank Mode Error\n语法有错。如果您需要帮助请对我说‘段位模式 帮助’。\n[Exception Occurred]\n{e}")
+        await rand_ranking.finish(f"▿ [Sender: {nickname}]\n  Rank Mode Error\n语法有错。如果您需要帮助请对我说‘段位模式 帮助’。\n[Exception Occurred]\n{e}")
 
 plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽舞霸])([極极将舞神者]舞?)进度\s?(.+)?')
 
@@ -1172,19 +1375,21 @@ async def _(bot: Bot, event: Event, state: T_State):
     db = get_driver().config.db
     c = await db.cursor()
     if f'{res.groups()[0]}{res.groups()[1]}' == '真将':
-        await plate.finish(f"▿ To {nickname} | Plate Error\n请您注意: 真系 (maimai & maimaiPLUS) 没有真将成就。")
+        await plate.finish(f"▿ [Sender: {nickname}]\n  Plate Error\n请您注意: 真系 (maimai & maimaiPLUS) 没有真将成就。")
         return
     if not res.groups()[2]:
         if mt == "guild":
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await plate.send(f"▿ To {nickname} | Plate - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await plate.send(f"▿ [Sender: {nickname}]\n  Plate - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
-                payload = {'qq': str(data[0])}
+                qq = str(data[0])
+                payload = {'qq': qq}
         else:
-            payload = {'qq': str(event.get_user_id())}
+            qq = str(event.get_user_id())
+            payload = {'qq': qq}
     else:
         payload = {'username': res.groups()[2].strip()}
     if res.groups()[0] in ['舞', '霸']:
@@ -1195,9 +1400,9 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload['version'] = [plate_to_version[res.groups()[0]]]
     player_data, success = await get_player_plate(payload)
     if success == 400:
-        await plate.send(f"▿ To {nickname} | Plate - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await plate.send(f"▿ [Sender: {nickname}]\n  Plate - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
-        await plate.send(f'▿ To {nickname} | Plate - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await plate.send(f'▿ [Sender: {nickname}]\n  Plate - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         song_played = []
         song_remain_expert = []
@@ -1259,7 +1464,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
         expcomplete = 100 - (len(song_remain_expert) / total_music_num * 100)
         mascomplete = 100 - (len(song_remain_master) / total_music_num * 100)
-        msg = f'''▾ To {nickname} | {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余歌曲数量如下：
+        msg = f'''▾ [Sender: {nickname}]\n  {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余歌曲数量如下：
 Expert | 已完成 {expcomplete:.2f}%, 待完成 {len(song_remain_expert)} 首 / 共 {total_music_num} 首
 Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 / 共 {total_music_num} 首
 '''
@@ -1310,7 +1515,60 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                     msg += f'Track {m.id} > {m.title} | {diffs[s[1]]}\n定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
             else:
                 msg += '已经没有大于 13+ 的谱面了,加油清谱吧！\n'
-        else: msg += f'{res.groups()[0]}{res.groups()[1]} 所需的所有歌曲均已达到要求，恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成了 {res.groups()[0]}{res.groups()[1]}！'
+        else:
+            msg += f'{res.groups()[0]}{res.groups()[1]} 所需的所有歌曲均已达到要求，恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成了 {res.groups()[0]}{res.groups()[1]}！'
+            if not res.groups()[2]:
+                if res.groups()[0] == "真":
+                    platever = 0
+                elif res.groups()[0] == "超":
+                    platever = 1
+                elif res.groups()[0] == "檄":
+                    platever = 2
+                elif res.groups()[0] == "橙":
+                    platever = 3
+                elif res.groups()[0] == "晓" or res.groups()[0] == "暁":
+                    platever = 4
+                elif res.groups()[0] == "桃":
+                    platever = 5
+                elif res.groups()[0] == "樱":
+                    platever = 6
+                elif res.groups()[0] == "紫":
+                    platever = 7
+                elif res.groups()[0] == "菫":
+                    platever = 8
+                elif res.groups()[0] == "白":
+                    platever = 9
+                elif res.groups()[0] == "雪":
+                    platever = 10
+                elif res.groups()[0] == "辉":
+                    platever = 11
+                elif res.groups()[0] == "舞" or res.groups()[0] == "霸":
+                    platever = 'X'
+                elif res.groups()[0] == "熊":
+                    platever = 12
+                elif res.groups()[0] == "华":
+                    platever = 13
+                elif res.groups()[0] == "爽":
+                    platever = 14
+                if res.groups()[1] == "极":
+                    platetype = 1
+                elif res.groups()[1] == "将":
+                    platetype = 2
+                elif res.groups()[1] == "神":
+                    platetype = 3
+                elif res.groups()[1] == "舞舞":
+                    platetype = 4
+                elif res.groups()[1] == "者":
+                    platetype = 5
+                platenum = f'9{platever}{platetype}'
+                await c.execute(f'select * from plate_table where id="{qq}"')
+                data = await c.fetchone()
+                if data is None:
+                    await c.execute(f'insert into plate_table values ({qq}, {platenum})')
+                else:
+                    await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
+                await db.commit()
+                msg += '\n相关牌子您已可在自主查询 B40 或 B50 时展现在您的姓名框处。'
         await plate.send(msg.strip())
 
 levelprogress = on_regex(r'^([0-9]+\+?)\s?(.+)进度\s?(.+)?')
@@ -1331,17 +1589,17 @@ async def _(bot: Bot, event: Event, state: T_State):
     c = await db.cursor()
     mt = event.message_type
     if res.groups()[0] not in levelList:
-        await levelprogress.finish(f"▿ To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
+        await levelprogress.finish(f"▿ [Sender: {nickname}]\n  参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
         return
     if res.groups()[1] not in scoreRank + comboRank + syncRank:
-        await levelprogress.finish(f"▿ To {nickname} | 参数错误\n输入有误。\n1.请不要随便带空格。\n2.等级目前只有D/C/B/BB/BBB/A/AA/AAA/S/S+/SS/SS+/SSS/SSS+\n3.同步相关只有FS/FC/FDX/FDX+/FC/FC+/AP/AP+。")
+        await levelprogress.finish(f"▿ [Sender: {nickname}]\n  参数错误\n输入有误。\n1.请不要随便带空格。\n2.等级目前只有D/C/B/BB/BBB/A/AA/AAA/S/S+/SS/SS+/SSS/SSS+\n3.同步相关只有FS/FC/FDX/FDX+/FC/FC+/AP/AP+。")
         return
     if not res.groups()[2]:
         if mt == "guild":
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await levelprogress.send(f"▿ To {nickname} | 等级清谱查询 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await levelprogress.send(f"▿ [Sender: {nickname}]\n  等级清谱查询 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1352,10 +1610,10 @@ async def _(bot: Bot, event: Event, state: T_State):
     payload['version'] = list(set(version for version in plate_to_version.values()))
     player_data, success = await get_player_plate(payload)
     if success == 400:
-        await levelprogress.send(f"▿ To {nickname} | 等级清谱查询 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await levelprogress.send(f"▿ [Sender: {nickname}]\n  等级清谱查询 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await levelprogress.send(f'▿ To {nickname} | 等级清谱查询 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await levelprogress.send(f'▿ [Sender: {nickname}]\n  等级清谱查询 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         song_played = []
@@ -1392,7 +1650,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(song_remain) > 0:
             if len(song_remain) < 50:
                 song_record = [[s['id'], s['level_index']] for s in player_data['verlist']]
-                msg += f'▼ To {nickname} | 清谱进度\n以下是 {"您" if not res.groups()[2] else res.groups()[2]} 的 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()} 的剩余曲目：\n'
+                msg += f'▼ [Sender: {nickname}]\n  清谱进度\n以下是 {"您" if not res.groups()[2] else res.groups()[2]} 的 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()} 的剩余曲目：\n'
                 for s in sorted(songs, key=lambda i: i[3]):
                     self_record = ''
                     if [int(s[0]), s[-1]] in song_record:
@@ -1409,9 +1667,9 @@ async def _(bot: Bot, event: Event, state: T_State):
                         self_record = "暂无"
                     msg += f'Track {s[0]} > {s[1]} | {s[2]}\nBase: {s[3]} 相对难度: {s[4]} 当前达成率: {self_record}'.strip() + '\n\n'
             else:
-                await levelprogress.finish(f'▾ To {nickname} | 清谱进度\n{"您" if not res.groups()[2] else res.groups()[2]} 还有 {len(song_remain)} 首 Lv.{res.groups()[0]} 的曲目还没有达成 {res.groups()[1].upper()},加油推分吧！')
+                await levelprogress.finish(f'▾ [Sender: {nickname}]\n  清谱进度\n{"您" if not res.groups()[2] else res.groups()[2]} 还有 {len(song_remain)} 首 Lv.{res.groups()[0]} 的曲目还没有达成 {res.groups()[1].upper()},加油推分吧！')
         else:
-            await levelprogress.finish(f'▾ To {nickname} | 清谱完成\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()}！')
+            await levelprogress.finish(f'▾ [Sender: {nickname}]\n  清谱完成\n恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()}！')
         await levelprogress.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))
 
 rankph = on_command('查看排行', aliases={'查看排名'})
@@ -1444,14 +1702,14 @@ async def _(bot: Bot, event: Event, state: T_State):
     db = get_driver().config.db
     c = await db.cursor()
     if res.groups()[0] and res.groups()[0] not in levelList:
-        await rise_score.finish(f"▿ To {nickname} | 参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
+        await rise_score.finish(f"▿ [Sender: {nickname}]\n  参数错误\n最低是1，最高是15，您这整了个{res.groups()[0]}......故意找茬的吧？")
         return
     if not res.groups()[2]:
         if mt == "guild":
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await rise_score.send(f"▿ To {nickname} | 犽的锦囊 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await rise_score.send(f"▿ [Sender: {nickname}]\n  犽的锦囊 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1461,10 +1719,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': res.groups()[2].strip()}
     player_data, success = await get_player_data(payload)
     if success == 400:
-        await rise_score.send(f"▿ To {nickname} | 犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await rise_score.send(f"▿ [Sender: {nickname}]\n  犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await rise_score.send(f'▿ To {nickname} | 犽的锦囊 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await rise_score.send(f'▿ [Sender: {nickname}]\n  犽的锦囊 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         dx_ra_lowest = 999
@@ -1506,12 +1764,12 @@ async def _(bot: Bot, event: Event, state: T_State):
                             if music_ra - sd_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
                                 music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
-            await rise_score.send(f"▿ To {nickname} | 犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
+            await rise_score.send(f"▿ [Sender: {nickname}]\n  犽的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
             return
         elif len(music_dx_list) + len(music_sd_list) > 60:
-            await rise_score.send(f"▿ To {nickname} | 犽的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
+            await rise_score.send(f"▿ [Sender: {nickname}]\n  犽的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
             return
-        msg = f'▼ To {nickname} | 犽的锦囊 - 升 {res.groups()[1]} 分攻略\n'
+        msg = f'▼ [Sender: {nickname}]\n  犽的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
             msg += f'----- B25 区域升分推荐 (旧版本乐曲) -----\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
@@ -1536,7 +1794,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await base.send(f"▿ To {nickname} | 底分分析 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
+                await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到小犽，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1549,10 +1807,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         name = username
     obj, success = await get_player_data(payload)
     if success == 400:
-        await base.send(f"▿ To {nickname} | 底分分析 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await base.send(f'▿ To {nickname} | 底分分析 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await base.send(f'▿ [Sender: {nickname}]\n  底分分析 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         try:
@@ -1868,10 +2126,14 @@ async def _(bot: Bot, event: Event, state: T_State):
                 min_ss_dx = ""
             if min_s_dx > 15.0 or min_s_dx < 1.0:
                 min_s_dx = ""
-            msg = f"▾ To {nickname} | 底分分析\n----------------------\nB25 -> Max: {sd_best_max_sc}  Min: {sd_best_min_sc} \nB15 -> Max: {dx_best_max_sc}  Min: {dx_best_min_sc} \n----------------------"
-            msg += f"\nType | SSS+ | SSS | SS+ | SS\n[B25]\nMax | {max_sssp}   {max_sss}   {max_ssp}   {max_ss}\n"
-            msg += f"Min | {min_sssp}   {min_sss}   {min_ssp}   {min_ss}\n[B15]\nMax | {max_sssp_dx}   {max_sss_dx}   {max_ssp_dx}   {max_ss_dx}\nMin | {min_sssp_dx}   {min_sss_dx}   {min_ssp_dx}   {min_ss_dx}\n"
-            msg += f"----------------------\n{name}的历史歌曲中最高 Rating (B25 天花板)大约是"
+            if name == "您":
+                msg = f"▾ [Sender: {nickname}]\n  Rating | 您的底分分析\n"
+            else:
+                msg = f"▾ [Sender: {nickname}]\n  Rating | {name}的底分分析\n"
+            msg += f"----------------------\nB25> #1: {sd_best_max_sc}  #25: {sd_best_min_sc} \nB15> #1: {dx_best_max_sc}  #15: {dx_best_min_sc} \n----------------------"
+            msg += f"\nType | SSS+ | SSS | SS+ | SS\n[B25]\n#1 | {max_sssp}   {max_sss}   {max_ssp}   {max_ss}\n"
+            msg += f"#25 | {min_sssp}   {min_sss}   {min_ssp}   {min_ss}\n[B15]\n#1 | {max_sssp_dx}   {max_sss_dx}   {max_ssp_dx}   {max_ss_dx}\n#15 | {min_sssp_dx}   {min_sss_dx}   {min_ssp_dx}   {min_ss_dx}\n"
+            msg += f"----------------------\n{name}的历史歌曲中：\n#1 的 Rating 相当于达成"
             if max_sssp != "":
                 msg += f" {max_sssp} 的 SSS+"
             if max_sss != "":
@@ -1884,7 +2146,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 msg += f"、{max_sp} 的 S+"
             if max_s != "":
                 msg += f"、{max_s} 的 S"
-            msg += "；\n最低 Rating (B25 地板)大约是"
+            msg += "可获得的 Rating；\n#25 的 Rating 相当于达成"
             if min_sssp != "":
                 msg += f" {min_sssp} 的 SSS+"
             if min_sss != "":
@@ -1897,7 +2159,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 msg += f"、{min_sp} 的 S+"
             if min_s != "":
                 msg += f"、{min_s} 的 S"
-            msg += f"。\n{name}的当前大版本歌曲中的最高 Rating (B15 天花板)大约是"
+            msg += f"可获得的 Rating。\n{name}的当前大版本歌曲中：\n#1 的 Rating 相当于达成"
             if max_sssp_dx != "":
                 msg += f" {max_sssp_dx} 的 SSS+"
             if max_sss_dx != "":
@@ -1910,7 +2172,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 msg += f"、{max_sp_dx} 的 S+"
             if max_s_dx != "":
                 msg += f"、{max_s_dx} 的 S"
-            msg += "；\n最低 Rating (B15 地板)大约是"
+            msg += "可获得的 Rating；\n#15 的 Rating 相当于达成"
             if min_sssp_dx != "":
                 msg += f" {min_sssp_dx} 的 SSS+"
             if min_sss_dx != "":
@@ -1923,8 +2185,8 @@ async def _(bot: Bot, event: Event, state: T_State):
                 msg += f"、{min_sp_dx} 的 S+"
             if min_s_dx != "":
                 msg += f"、{min_s_dx} 的 S"
-            msg += "。\n请注意：Best 15 按照全部歌曲的最高等级 (即 15.0) 显示；如需升分推荐，请移步犽的锦囊。"
+            msg += "可获得的 Rating。\n请注意：B15 按照当前大版本的最高等级 (即 15.0) 来表示；如需升分推荐，请移步犽的锦囊。"
             await base.send(msg)
         except Exception as e:
-            await base.send(f"▿ To {nickname} | 底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")
+            await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")
             return

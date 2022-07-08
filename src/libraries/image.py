@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.windows_events import NULL
 import base64
 from io import BytesIO
 
@@ -71,4 +72,8 @@ async def get_jlpx(jl, px, bottom):
     async with aiohttp.request(method='POST', url="http://jiqie.zhenbi.com/e/re111.php", data=data) as resp:
         t = await resp.text()
         regex = '<img src="(.+)">'
-        return re.match(regex, t).groups()[0]
+        obj = re.match(regex, t)
+        if obj is None:
+            return -1
+        else:
+            return obj.groups()[0]

@@ -44,6 +44,9 @@ async def _(bot: Bot, event: Event, state: T_State):
         return
     await jlpx.send(f"▾ [Sender: {nickname}]\n  Kiba Image Creator - 金龙盘旋\n正在生成，请耐心等待。如 5 分钟内没有输出图像，可能是被吞了，届时请再试一次。")
     url = await get_jlpx(argv[0], argv[1], argv[2])
+    if url == -1:
+        await jlpx.send("当前金龙盘旋生成的服务器Request无返回，请稍后重试。")
+        return
     await jlpx.send(Message([{
         "type": "image",
         "data": {

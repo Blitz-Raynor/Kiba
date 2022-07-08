@@ -5,7 +5,6 @@ from copy import deepcopy
 
 import requests
 
-
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
     diff_ret = []
@@ -184,3 +183,9 @@ def get_music_list():
 
 
 total_list = get_music_list()
+
+def get_cover_len4_id(mid) -> str:
+    mid = int(mid)
+    if 10001 <= mid:
+        mid -= 10000
+    return f'{mid:04d}'

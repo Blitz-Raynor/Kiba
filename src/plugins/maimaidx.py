@@ -113,25 +113,30 @@ setplate                                                                        
 
 def song_txt(music: Music):
     try:
-        fileimage = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        fileimage = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.jpg"
         imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
+        sentimagedata = f"base64://{str(image_to_base64(imagedata), encoding='utf-8')}"
     except:
         try:
-            fileimage = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.png")
+            fileimage = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
             imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
+            sentimagedata = f"base64://{str(image_to_base64(imagedata), encoding='utf-8')}"
         except:
             try:
                 fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.jpg"))
+                sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
             except:
                 try:
                     fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.png"))
+                    sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
                 except:
                     fileimage = Image.open(os.path.join('src/static/mai/pic/', f"noimage.png"))
+                    sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
     return Message([
         {
             "type": "image",
             "data": {
-                "file":  f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
+                "file":  sentimagedata
             }
         },
         {
@@ -1053,7 +1058,10 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     guess: GuessObject = state["guess_object"]
     if guess.is_end:
         return
-    asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")])))
+    mid = guess.music['id']
+    if mid >= 10001:
+        mid -= 10000
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")])))
     del guess_dict[state["k"]]
 
 
@@ -1114,10 +1122,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     if ans == guess.music['id'] or (ans.lower() == guess.music['title'].lower()) or (len(ans) >= 5 and ans.lower() in guess.music['title'].lower()):
         guess.is_end = True
         del guess_dict[k]
+        mid = guess.music['id']
+        if mid >= 10001:
+            mid -= 10000
         await guess_music_solve.finish(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n"),
-            MessageSegment.image(f"https://www.diving-fish.com/covers/{guess.music['id']}.jpg")
+             MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")
         ]))
 
 waiting_set = on_command("设置店铺")

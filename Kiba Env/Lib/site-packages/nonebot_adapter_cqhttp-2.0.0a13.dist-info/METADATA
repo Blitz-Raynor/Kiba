@@ -1,0 +1,36 @@
+Metadata-Version: 2.1
+Name: nonebot-adapter-cqhttp
+Version: 2.0.0a13
+Summary: OneBot(CQHTTP) adapter for nonebot2
+Home-page: https://v2.nonebot.dev/
+License: MIT
+Keywords: bot,qq,qqbot,coolq,cqhttp
+Author: yanyongyu
+Author-email: yyy@nonebot.dev
+Requires-Python: >=3.7.3,<4.0.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Robot Framework
+Classifier: Framework :: Robot Framework :: Library
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Dist: httpx (>=0.17.0,<0.18.0)
+Requires-Dist: nonebot2 (>=2.0.0-alpha.13,<3.0.0)
+Project-URL: Documentation, https://v2.nonebot.dev/
+Project-URL: Repository, https://github.com/nonebot/nonebot2
+Description-Content-Type: text/markdown
+
+<p align="center">
+  <a href="https://v2.nonebot.dev/"><img src="https://raw.githubusercontent.com/nonebot/nonebot2/master/docs/.vuepress/public/logo.png" width="200" height="200" alt="nonebot"></a>
+</p>
+
+<div align="center">
+
+# NoneBot-Adapter-CQHTTP
+
+_✨ OneBot(CQHTTP) 协议适配 ✨_
+
+</div>
+

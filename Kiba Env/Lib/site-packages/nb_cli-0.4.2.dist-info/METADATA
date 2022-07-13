@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: nb-cli
+Version: 0.4.2
+Summary: CLI for nonebot2
+Home-page: https://github.com/nonebot/nb-cli
+License: MIT
+Keywords: bot,qq,nonebot
+Author: yanyongyu
+Author-email: yanyongyu_1@126.com
+Requires-Python: >=3.7.3,<4.0.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Robot Framework
+Classifier: Framework :: Robot Framework :: Library
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Provides-Extra: deploy
+Provides-Extra: docker
+Requires-Dist: click (>=7.1.2,<8.0.0)
+Requires-Dist: colorama (>=0.4.3,<0.5.0)
+Requires-Dist: cookiecutter (>=1.7.2,<2.0.0)
+Requires-Dist: docker-compose (>=1.28.2,<1.29.0); extra == "deploy" or extra == "docker"
+Requires-Dist: httpx (>=0.17.0,<0.18.0)
+Requires-Dist: nonebot2 (>=2.0.0-alpha.12,<3.0.0)
+Requires-Dist: pyfiglet (>=0.8.post1,<0.9)
+Requires-Dist: pyinquirer (==1.0.3)
+Requires-Dist: tomlkit (>=0.7.0,<0.8.0)
+Project-URL: Repository, https://github.com/nonebot/nb-cli
+Description-Content-Type: text/markdown
+
+# nb-cli
+
+CLI for nonebot2
+
+Features:
+
+- Create A NoneBot Project
+- Run NoneBot
+- Deploy NoneBot to Docker
+- Plugin Management
+  - Create new plugins
+  - Search for NoneBot Plugins Published on Official Store
+  - Install NoneBot Plugin Published on Official Store
+
+## How to use
+
+### Installation
+
+```shell
+pip install nb-cli
+```
+
+or, with optional `deploy` dependency
+
+```shell
+pip install nb-cli[deploy]
+```
+
+### Command-line usage
+
+```shell
+nb --help
+```
+
+### Interactive mode usage
+
+```shell
+nb
+```
+
+### CookieCutter usage
+
+Creating a project
+
+```shell
+pip install cookiecutter
+cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/project"
+```
+

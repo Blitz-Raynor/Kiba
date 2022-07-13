@@ -3,3 +3,4 @@ src/static
 .code
 venv
 __pycache__
+/env

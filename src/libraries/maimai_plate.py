@@ -23,7 +23,8 @@ plate_to_version = {
         '熊': 'maimai でらっくす',
         '華': 'maimai でらっくす PLUS',
         '华': 'maimai でらっくす PLUS',
-        '爽': 'maimai でらっくす Splash'
+        '爽': 'maimai でらっくす Splash',
+        '煌': 'maimai でらっくす Splash PLUS'
 }
 
 

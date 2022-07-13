@@ -1374,11 +1374,11 @@ async def _(bot: Bot, event: Event, state: T_State):
     except Exception as e:
         await rand_ranking.finish(f"▿ [Sender: {nickname}]\n  Rank Mode Error\n语法有错。如果您需要帮助请对我说‘段位模式 帮助’。\n[Exception Occurred]\n{e}")
 
-plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽舞霸])([極极将舞神者]舞?)进度\s?(.+)?')
+plate = on_regex(r'^([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸])([極极将舞神者]舞?)进度\s?(.+)?')
 
 @plate.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    regex = "([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽舞霸])([極极将舞神者]舞?)进度\s?(.+)?"
+    regex = "([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉熊華华爽煌舞霸])([極极将舞神者]舞?)进度\s?(.+)?"
     res = re.match(regex, str(event.get_message()).lower())
     diffs = 'Basic Advanced Expert Master Re:Master'.split(' ')
     nickname = event.sender.nickname
@@ -1561,6 +1561,8 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                     platever = 13
                 elif res.groups()[0] == "爽":
                     platever = 14
+                elif res.groups()[0] == "煌":
+                    platever = 15
                 if res.groups()[1] == "极":
                     platetype = 1
                 elif res.groups()[1] == "将":

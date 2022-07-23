@@ -19,7 +19,21 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="src\static\adobe_simhei.otf" />
+    <Content Include="src\static\aliases.csv" />
+    <Content Include="src\static\arcsong.db" />
+    <Content Include="src\static\career_data.json" />
+    <Content Include="src\static\high_eq_image.png" />
+    <Content Include="src\static\HOS.ttf" />
+    <Content Include="src\static\HOS_Bold.ttf" />
+    <Content Include="src\static\HOS_Med.ttf" />
+    <Content Include="src\static\Kiba.db" />
+    <Content Include="src\static\msyh.ttc" />
+    <Content Include="src\static\static.7z.001" />
+    <Content Include="src\static\static.7z.002" />
+    <Content Include="src\static\static.exe" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="bot.py" />
@@ -49,6 +63,7 @@
     <Folder Include="src\" />
     <Folder Include="src\libraries" />
     <Folder Include="src\plugins" />
+    <Folder Include="src\static\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="Kiba Env\">

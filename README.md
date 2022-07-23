@@ -34,7 +34,7 @@ Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为
 
 建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
 
-在运行项目之前，您需要进入`src/static`文件夹，运行自解压程序`static_images.exe`，并解压到`src/static`中（如您是 Linux 或 Unix，请解压`static_images.7z.001`）。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
+在运行项目之前，您需要进入`src/static`文件夹，运行自解压程序`static.exe`，并解压到`src/static`中（如您是 Linux 或 Unix，请解压`static.7z.001`）。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
 
 在 Windows 10 / Windows Server 2016 以上的系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
 如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`命令提示符(Command Prompt)`，`Windows Powershell`以及`cd`命令的教程。

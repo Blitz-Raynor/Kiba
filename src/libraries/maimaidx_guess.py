@@ -24,7 +24,7 @@ class GuessObject:
             f"的 BPM 是 {self.music['basic_info']['bpm']}"
         ]
         self.guess_options = random.sample(self.guess_options, 6)
-        pngPath = cover_dir + f"{get_cover_len4_id(int(self.music['id']))}.png"
+        pngPath = cover_dir + f"{int(self.music['id'])}.png"
         if not os.path.exists(pngPath):
             pngPath = cover_dir + f"{int(self.music['id'])}.jpg"
         if not os.path.exists(pngPath):

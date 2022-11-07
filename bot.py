@@ -5,7 +5,6 @@ from collections import defaultdict
 import nonebot
 from nonebot.adapters.cqhttp import Bot as CQHTTPBot
 
-
 # Custom your logger
 # 
 # from nonebot.log import logger, default_format

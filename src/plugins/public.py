@@ -31,7 +31,7 @@ helper = on_command('help', aliases={'about'})
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     pic_dir = 'src/static/mai/pic/'
-    about_str =  f"版本代号: Kiba 2022\n版本号: 4.0 (4.010.220713)\n----------------------\nGithub:\nhttps://github.com/KilluaSakata/Kiba\nProject Kiba Credits:\n@Killua Sakata\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX/Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede\n\n▾ Getting Started | 上手帮助\n查询 Maimai DX 模块帮助: maimai.help\n查询 跑团/COC 模块帮助: coc.help\n查询 Arcaea 模块 (Beta) 帮助: arcaea.help\n查询 其它功能/漂流社区 帮助: public.help\n查询 群管理模块 帮助: admin.help"
+    about_str =  f"版本代号: Kiba 2022\n版本号: 4.2 (4.200.2211080115)\n----------------------\nGithub:\nhttps://github.com/KilluaSakata/Kiba\nProject Kiba Credits:\n@Killua Sakata\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX/Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede\n\n▾ Getting Started | 上手帮助\n查询 Maimai DX 模块帮助: maimai.help\n查询 跑团/COC 模块帮助: coc.help\n查询 Arcaea 模块 (Beta) 帮助: arc help\n查询 其它功能/漂流社区 帮助: public.help\n查询 群管理模块 帮助: admin.help"
     image = Image.open(os.path.join(pic_dir, 'KibaAbout.jpg')).convert('RGBA')
     await helper.send(Message([{"type": "image","data":{"file": f"base64://{str(image_to_base64(image), encoding='utf-8')}"}},{"type": "text","data":{"text": about_str}}]))
    

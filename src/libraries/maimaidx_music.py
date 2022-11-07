@@ -63,7 +63,10 @@ class Stats(Dict):
         elif item == 'total':
             return self['t']
         elif item == 'difficulty':
-            return self['tag']
+            try:
+                return self['tag']
+            except:
+                return "--"
         elif item in self:
             return self[item]
         return super().__getattribute__(item)

@@ -405,8 +405,8 @@ async def _(bot: Bot, event: Event, state: T_State):
                 imagestandard = imagestandard.resize((int(imagestandard.size[0] * 0.8), int(imagestandard.size[1] * 0.8)))
                 baseimage.paste(imagestandard, (480,26), mask=imagestandard.split()[3])
                 imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
-                if coloumWidth(music["title"]) > 40:
-                    title = changeColumnWidth(music["title"], 11) + '...'
+                if coloumWidth(music["title"]) > 30:
+                    title = changeColumnWidth(music["title"], 20) + '...'
                     imageDraw.text((33, 680), title, 'black', fontBoldL)
                 else:
                     imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
@@ -433,8 +433,8 @@ async def _(bot: Bot, event: Event, state: T_State):
                 imagedx = imagedx.resize((int(imagedx.size[0] * 0.8), int(imagedx.size[1] * 0.8)))
                 baseimage.paste(imagedx, (480,26), mask=imagedx.split()[3])
                 imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
-                if coloumWidth(music["title"]) > 40:
-                    title = changeColumnWidth(music["title"], 11) + '...'
+                if coloumWidth(music["title"]) > 30:
+                    title = changeColumnWidth(music["title"], 20) + '...'
                     imageDraw.text((33, 680), title, 'black', fontBoldL)
                 else:
                     imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
@@ -502,8 +502,8 @@ async def _(bot: Bot, event: Event, state: T_State):
             fontTools = ImageFont.truetype('src/static/adobe_simhei.otf', 20, encoding='utf-8')
             imageDraw = ImageDraw.Draw(baseimage);
             imageDraw.text((70, 618), f'{music["id"]}', 'white', fontBold)
-            if coloumWidth(music["title"]) > 40:
-                title = changeColumnWidth(music["title"], 11) + '...'
+            if coloumWidth(music["title"]) > 30:
+                title = changeColumnWidth(music["title"], 20) + '...'
                 imageDraw.text((33, 660), title, 'black', fontBoldL)
             else:
                 imageDraw.text((33, 660), f'{music["title"]}', 'black', fontBoldL)
@@ -553,13 +553,134 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓DX分', '收歌', '理论值', '打东方曲', '打索尼克曲']
-bwm_list_perfect = ['拆机:然后您被机修当场处决', '女装:怎么这么好康！（然后受到了欢迎）', '耍帅:看我耍帅还AP+', '击剑:Alea jacta est!(SSS+)', '打滴蜡熊:看我今天不仅推了分，还收了歌！', '日麻:看我三倍役满!!!你们三家全都起飞!!!', '出勤:不出则已，一出惊人，当场AP，羡煞众人。', '看手元:哦原来是这样！看了手元果真推分了。', '霸机:这么久群友都没来，霸机一整天不是梦！', '打Maipad: Maipad上收歌了，上机也收了。', '唱打: Let the bass kick! O-oooooooooo AAAAE-A-A-I-A-U- JO-oooooooooooo AAE-O-A-A-U-U-A- E-eee-ee-eee AAAAE-A-E-I-E-A- JO-ooo-oo-oo-oo EEEEO-A-AAA-AAAA O-oooooooooo AAAAE-A-A-I-A-U-......', '抓绝赞: 把把2600，轻松理论值！']
+bwm_list_perfect = ['拆机:然后您被机修当场处决', '女装:怎么这么好康！（然后受到了欢迎）', '耍帅:看我耍帅还AP+', '击剑:Alea jacta est!(SSS+)', '打滴蜡熊:看我今天不仅推了分，还收了歌！', '日麻:看我三倍役满!!!你们三家全都起飞!!!', '出勤:不出则已，一出惊人，当场AP，羡煞众人。', '看手元:哦原来是这样！看了手元果真推分了。', '霸机:这么久群友都没来，霸机一整天不是梦！', '打Maipad: Maipad上收歌了，上机也收了。', '唱打: Let the bass kick! ', '抓绝赞: 把把2600，轻松理论值！']
 bwm_list_bad = ['拆机:不仅您被机修当场处决，还被人尽皆知。', '女装:杰哥说你怎么这么好康！让我康康！！！（被堵在卫生间角落）', '耍帅:星星全都粉掉了......', '击剑:Alea jacta est!(指在线下真实击剑)', '打滴蜡熊:滴蜡熊打你。', '日麻:我居然立直放铳....等等..三倍役满??????', '出勤:当场分数暴毙，惊呆众人。', '看手元:手法很神奇，根本学不来。', '霸机:......群友曰:"霸机是吧？踢了！"', '打Maipad: 上机还是不大会......', '唱打: 被路人拍下上传到了某音。', '抓绝赞: 啊啊啊啊啊啊啊捏妈妈的我超！！！ --- 这是绝赞(好)的音效。']
-tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套！如果游玩时手套破裂或许会有大用！', '游玩时注意手指安全！意外戳到边框时若引发剧烈疼痛请立刻下机以休息手指，必要时可以选择就医。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以通过这个指令再随一次。', '疫情防护，人人有责。在游玩结束后请主动佩戴口罩！', '出勤时注意交通安全，身体安全永远在第一位！', '迪拉熊不断吃绝赞？去找机修教训它。', '热知识：DX理论值是101.0000，但是旧框没有固定的理论值。', '冷知识：每个绝赞 Perfect 等级有 2600/2550/2500，俗称理论/50落/100落。']
+tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套。', '游玩时注意手指安全。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以再随一次。', '疫情防护，人人有责。游玩结束后请主动佩戴口罩！', '出勤时注意交通安全。', '迪拉熊不断吃绝赞也不要大力敲打他哟。', '热知识：DX理论值是101.0000，但是旧框没有固定的理论值。', '冷知识：每个绝赞 Perfect 等级有 2600/2550/2500，俗称理论/50落/100落。']
 fx_list = ['东', '西', '南', '北']
 play_list = ['1P', '2P', '排队区']
 
-jrwm = on_command('今日运势', aliases={'今日舞萌'})
+jrwm = on_command('/text 今日运势', aliases={'/text 今日舞萌'})
+jrwmnew = on_command('今日运势', aliases={'今日舞萌'})
+
+@jrwmnew.handle()
+async def _(bot: Bot, event: Event, state: T_State):   
+    qq = int(event.get_user_id())
+    nickname = event.sender.nickname
+    h = hash(qq)
+    rp = h % 100
+    luck = hash(int((h * 4) / 3)) % 100
+    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
+    wm_value = []
+    good_value = {}
+    bad_value = {}
+    good_count = 0
+    bad_count = 0
+    dwm_value_1 = random.randint(0,11)
+    dwm_value_2 = random.randint(0,11)
+    tips_value = random.randint(0,11)
+    now = datetime.datetime.now()
+    for i in range(14):
+        wm_value.append(h & 3)
+        h >>= 2
+    pic_dir = 'src/static/mai/pic/'         
+    baseimage =  Image.open(os.path.join(pic_dir, f'KibaTips.png')).convert('RGBA')
+    font = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
+    fonttips = ImageFont.truetype('src/static/HOS.ttf', 24, encoding='utf-8')
+    font1 = ImageFont.truetype('src/static/HOS.ttf', 38, encoding='utf-8')
+    fontLV = ImageFont.truetype('src/static/HOS.ttf', 72, encoding='utf-8')
+    fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
+    fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 48, encoding='utf-8')
+    imageDraw = ImageDraw.Draw(baseimage);
+    imageDraw.text((35, 125), f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}", 'black', font)
+    if luck >= 50:
+        imageDraw.text((962, 228), f"吉", 'white', font1)
+    else:
+        imageDraw.text((962, 228), f"凶", 'white', font1)
+    if dwm_value_1 == dwm_value_2:
+        imageDraw.text((142, 565), f"并无适宜。", 'black', font)
+        imageDraw.text((142, 710), f"也并无忌惮。", 'black', font)
+    else:
+        imageDraw.text((142, 565), f"{bwm_list_perfect[dwm_value_1]}", 'black', font)
+        imageDraw.text((142, 710), f"{bwm_list_bad[dwm_value_2]}", 'black', font)
+    imageDraw.text((170, 880), f"{ap}", 'white', fontLV)
+    for i in range(14):
+        if wm_value[i] == 3:
+            good_value[good_count] = i
+            good_count = good_count + 1
+        elif wm_value[i] == 0:
+            bad_value[bad_count] = i
+            bad_count = bad_count + 1
+    if good_count == 0:
+        imageDraw.text((420, 925), f"出勤诸事不宜。", 'black', font)
+    else:
+        imageDraw.text((420, 925), f"出勤宜做以下 {good_count} 项事:", 'black', font)
+        s = ""
+        for i in range(good_count):
+            s += f'{wm_list[good_value[i]]} '
+        slist = s.split(" ")
+        newslist = ""
+        for i in range(len(slist)):
+            if i % 7 == 0 and i != 0:
+                newslist += "\n"
+            newslist += f'{slist[i]} '
+        imageDraw.text((350, 1000), f"{newslist}", 'black', font)
+    if bad_count == 0:
+        imageDraw.text((420, 1100), f"出勤一切顺利。", 'black', font)
+    else:
+        imageDraw.text((420, 1100), f"出勤不宜做以下 {bad_count} 项事:", 'black', font)
+        s = ""
+        for i in range(bad_count):
+            s += f'{wm_list[bad_value[i]]} '
+        slist = s.split(" ")
+        newslist = ""
+        for i in range(len(slist)):
+            if i % 7 == 0 and i != 0:
+                newslist += "\n"
+            newslist += f'{slist[i]} '
+        imageDraw.text((350, 1175), f"{newslist}", 'black', font)
+    imageDraw.text((120, 1443), f"{tips_list[tips_value]}", 'black', fonttips)
+    music = total_list[hash(qq) % len(total_list)]
+    try:
+        file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
+        imagedata = imagedata.resize((int(400), int(400)))
+    except:
+         try:
+             pic_cover = 'src/static/mai/cover/'
+             try:
+                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+             except:
+                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+             imagedata = imagedata.resize((int(400), int(400)))
+         except:
+             imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
+             imagedata = imagedata.resize((int(400), int(400)))
+    baseimage.paste(imagedata, (90,1801), mask=imagedata.split()[3])
+    imageDraw.text((582, 1773), f"{music['id']}", 'black', fontBold)
+    if coloumWidth(music["title"]) > 30:
+        title = changeColumnWidth(music["title"], 20) + '...'
+        imageDraw.text((539, 1823), title, 'black', fontBoldL)
+    else:
+        imageDraw.text((539, 1823), f"{music['title']}", 'black', fontBoldL)
+    imageDraw.text((539, 1890), f"{music['basic_info']['artist']}", 'black', fonttips)
+    imageDraw.text((539, 2040), f"{music['basic_info']['genre']}", 'black', fonttips)
+    imageDraw.text((539, 2150), f"{music['basic_info']['from']}", 'black', fonttips)
+    imageDraw.text((95, 2290), f'{"  -  ".join(music["level"])}', 'black', font1)
+    await jrwmnew.send(Message([
+            {
+                "type": "image",
+                "data": {
+                    "file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"
+                }
+            },
+            {
+                    "type": "text",
+                    "data": {
+                        "text": f"在查找文字版本的运势板吗？输入命令 '/text 今日运势' 即可激活文字版运势。"
+                    }
+            }
+        ]))
+
 
 @jrwm.handle()
 async def _(bot: Bot, event: Event, state: T_State):   
@@ -581,7 +702,7 @@ async def _(bot: Bot, event: Event, state: T_State):
     for i in range(14):
         wm_value.append(h & 3)
         h >>= 2
-    s = f"▾ [Sender: {nickname}]\n  Fortune | 运势黑板\n◢ 查询时间\n{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n\n"
+    s = f"▾ [Sender: {nickname}]\n  Fortune | 运势板\n◢ 查询时间\n{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}\n\n"
     s += f"◢ 占卜板\n---------------------\n"
     if rp >= 50 and rp < 70 or rp >= 70 and rp < 90 and luck < 60:
         s += "末吉: 有那么一点小幸运，打maimai吃了几分，不亏不亏~"
@@ -624,8 +745,8 @@ async def _(bot: Bot, event: Event, state: T_State):
             s += f'{wm_list[bad_value[i]]} '
     s += f'\n\n◢ 运势板\n有一些 Tips:\n{tips_list[tips_value]}\n'
     s += "运势锦囊:\n"
-    music = total_list[hash(qq) * now.day * now.month % len(total_list)]
-    await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music)))
+    music = total_list[hash(qq) % len(total_list)]
+    await jrwm.finish(Message([{"type": "text", "data": {"text": s}}] + song_txt(music) + [{"type": "text", "data": {"text": "图片版运势板已上线！使用命令 '今日运势' 试试吧。"}}]))
 
 
 randomthings = ['推分成功！！正当你兴奋之余，突然机厅断电了。', '你心血来潮打HERA，绿了两串纵连之后转身掏出了筋膜枪。','你打花一轮的时候，后面传来了:"铸币吧打野走位，像那B三狼。" 看来你要与OTTO一起出勤了。', 'STOP Playing MAIMAI', '最心心念念的歌曲推分成功啦！']
@@ -1042,11 +1163,16 @@ async def guess_music_loop(bot: Bot, event: Event, state: T_State):
     if cycle < 6:
         asyncio.create_task(bot.send(event, f"▾ 猜歌提示 | 第 {cycle + 1} 个 / 共 7 个\n这首歌" + guess.guess_options[cycle]))
     else:
-        asyncio.create_task(bot.send(event, Message([
-            MessageSegment.text("▾ 猜歌提示 | 第 7 个 / 共 7 个\n这首歌封面的一部分是："),
-            MessageSegment.image("base64://" + str(guess.b64image, encoding="utf-8")),
-            MessageSegment.text("快和群里的小伙伴猜一下吧！\n提示: 30 秒内可以回答这首歌的ID、歌曲标题或歌曲标题的大于5个字的连续片段，超时我将揭晓答案。")
-        ])))
+        try:
+            asyncio.create_task(bot.send(event, Message([
+                MessageSegment.text("▾ 猜歌提示 | 第 7 个 / 共 7 个\n这首歌封面的一部分是："),
+                MessageSegment.image("base64://" + str(guess.b64image, encoding="utf-8")),
+                MessageSegment.text("快和群里的小伙伴猜一下吧！\n提示: 30 秒内可以回答这首歌的ID、歌曲标题或歌曲标题的大于5个字的连续片段，超时我将揭晓答案。")
+            ])))
+        except:
+            asyncio.create_task(bot.send(event, Message([
+                MessageSegment.text("▾ 猜歌提示 | 第 7 个 / 共 7 个\nemm....本来应该显示这个封面的一部分来着....但是出了点错误，那就用前面六个提示猜一下吧，相信你可以哒！30s内可以回答这首歌的ID、歌曲标题或歌曲标题的大于5个字的连续片段，超时我将揭晓答案。"),
+            ])))
         asyncio.create_task(give_answer(bot, event, state))
         return
     state["cycle"] += 1
@@ -1059,9 +1185,15 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     if guess.is_end:
         return
     mid = guess.music['id']
-    if mid >= 10001:
-        mid -= 10000
-    asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")])))
+    if int(mid) >= 10001:
+        mid = int(mid) - 10000
+    try:
+        asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")])))
+    except:
+        try:
+            asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.jpg")])))
+        except:
+            asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n" + "使用 id 命令可以查看歌曲详情。")])))
     del guess_dict[state["k"]]
 
 
@@ -1094,7 +1226,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await guess_music.finish("▿ 猜歌 - 同时进行的群过多\n小犽有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
         return
     if k in guess_cd_dict and time.time() < guess_cd_dict[k]:
-        await guess_music.finish(f"▿ 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢")
+        await guess_music.finish(f"▿ 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢。")
         return
     guess = GuessObject()
     guess_dict[k] = guess
@@ -1123,14 +1255,19 @@ async def _(bot: Bot, event: Event, state: T_State):
         guess.is_end = True
         del guess_dict[k]
         mid = guess.music['id']
-        if mid >= 10001:
-            mid -= 10000
-        await guess_music_solve.finish(Message([
-            MessageSegment.reply(event.message_id),
-            MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n"),
-             MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")
-        ]))
-
+        if int(mid) >= 10001:
+            mid = int(mid) - 10000
+        try:
+            await guess_music_solve.finish(Message([
+                MessageSegment.reply(event.message_id),
+                MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n"),
+                MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")
+            ]))
+        except:
+            await guess_music_solve.finish(Message([
+                MessageSegment.reply(event.message_id),
+                MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n" + "使用 id 命令可以查看歌曲详情。"),
+            ]))
 waiting_set = on_command("设置店铺")
 @waiting_set.handle()
 async def _(bot: Bot, event: Event, state: T_State):
@@ -1405,7 +1542,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': res.groups()[2].strip()}
     if res.groups()[0] in ['舞', '霸']:
         payload['version'] = list(set(version for version in plate_to_version.values()))
-    if res.groups()[0] in ['真']:
+    elif res.groups()[0] in ['真']:
         payload['version'] = [plate_to_version['真1'], plate_to_version['真2']]
     else:
         payload['version'] = [plate_to_version[res.groups()[0]]]
@@ -1472,7 +1609,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         for song in song_remain_expert + song_remain_master + song_remain_re_master:
             music = total_list.by_id(str(song[0]))
             if music.ds[song[1]] > 13.6:
-                song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                try:
+                    song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                except:
+                    song_remain_difficult.append([music.id, music.title, "--", music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
         expcomplete = 100 - (len(song_remain_expert) / total_music_num * 100)
         mascomplete = 100 - (len(song_remain_master) / total_music_num * 100)
         msg = f'''▾ [Sender: {nickname}]\n  {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余歌曲数量如下：
@@ -1482,13 +1622,17 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
         song_remain = song_remain_expert + song_remain_master + song_remain_re_master
         song_record = [[s['id'], s['level_index']] for s in player_data['verlist']]
         if res.groups()[0] in ['舞', '霸']:
-            remascomplete = 100 - (len(song_remain_re_master) / total_music_num * 100)
-            msg += f'Re:Master | 已完成 {remascomplete:.2f}%, 待完成 {len(song_remain_re_master)} 首 / 共 {total_music_num} 首\n'
+            remascomplete = 100 - (len(song_remain_re_master) / 79 * 100)
+            msg += f'Re:Master | 已完成 {remascomplete:.2f}%, 待完成 {len(song_remain_re_master)} 首 / 共 79 首\n'
         if len(song_remain_difficult) > 0:
             if len(song_remain_difficult) < 11:
                 if res.groups()[0] in ['真']:
-                        msg += "\n注意: 真系不需要游玩ジングルベル(以下简称\"圣诞歌\")。受技术限制，真系查询仍包括圣诞歌，您可以忽略此歌曲。如您的真系进度只剩下圣诞歌，则您已达成条件。\n"
-                msg += '\n剩余的 13+ 及以上的谱面如下：\n'
+                    msg += "\n注意: 真系不需要游玩ジングルベル(以下简称\"圣诞歌\")。受技术限制，真系查询仍包括圣诞歌，您可以忽略此歌曲。如您的真系进度只剩下圣诞歌，则您已达成条件。但您若需要在B40/B50查询时显示此牌子，您仍需完成圣诞歌。\n"
+                elif res.groups()[0] in ['熊'] or res.groups()[0] in ['华', '華']:
+                    msg += "\n此功能对应牌子遵循的版本为日版，国行版本中，完成版本 舞萌DX 分类内的歌曲可同时获得熊、华两牌。"
+                elif res.groups()[0] in ['爽'] or res.groups()[0] in ['煌']:
+                    msg += "\n此功能对应牌子遵循的版本为日版，国行版本中，完成版本 舞萌DX2021 分类内的歌曲可同时获得熊、华两牌。"
+                msg += '\n剩余重点歌曲（>= 13.7）：\n'
                 for s in sorted(song_remain_difficult, key=lambda i: i[3]):
                     self_record = ''
                     if [int(s[0]), s[-1]] in song_record:
@@ -1504,10 +1648,10 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                     if res.groups()[0] in ['真'] and s[0] == 70:
                         continue
                     msg += f'Track {s[0]} > {s[1]} | {s[2]}\n定数: {s[3]} 相对难度: {s[4]} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
-            else: msg += f'还有 {len(song_remain_difficult)} 个等级是 13+ 及以上的谱面，加油推分捏！\n'
+            else: msg += f'还有 {len(song_remain_difficult)} 个等级是 13+ 及以上的谱面，加油推分吧！\n'
         elif len(song_remain) > 0:
             if len(song_remain) < 11:
-                msg += '\n剩余曲目：\n'
+                msg += '\n还有以下剩余重点曲目（>=13.7）：\n'
                 for s in sorted(song_remain, key=lambda i: i[3]):
                     m = total_list.by_id(str(s[0]))
                     self_record = ''
@@ -1525,7 +1669,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                         continue
                     msg += f'Track {m.id} > {m.title} | {diffs[s[1]]}\n定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
             else:
-                msg += '已经没有大于 13+ 的谱面了,加油清谱吧！\n'
+                msg += f'{res.groups()[0]}{res.groups()[1]} 已确定！当前已经没有大于 13+ 及其以上的谱面了,加油清谱吧！\n'
         else:
             msg += f'{res.groups()[0]}{res.groups()[1]} 所需的所有歌曲均已达到要求，恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成了 {res.groups()[0]}{res.groups()[1]}！'
             if not res.groups()[2]:
@@ -1581,7 +1725,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                 else:
                     await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
                 await db.commit()
-                msg += '\n相关牌子您已可在自主查询 B40 或 B50 时展现在您的姓名框处。'
+                msg += '\n您在自主查询 B40 或 B50 时，这个牌子将展现在您的姓名框处。'
         await plate.send(msg.strip())
 
 levelprogress = on_regex(r'^([0-9]+\+?)\s?(.+)进度\s?(.+)?')
@@ -1658,7 +1802,10 @@ async def _(bot: Bot, event: Event, state: T_State):
         songs = []
         for song in song_remain:
             music = total_list.by_id(str(song[0]))
-            songs.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+            try:
+                songs.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+            except:
+                songs.append([music.id, music.title, "--", music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
         msg = ''
         if len(song_remain) > 0:
             if len(song_remain) < 50:

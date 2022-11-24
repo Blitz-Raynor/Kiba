@@ -1,5 +1,7 @@
 from collections import defaultdict
+from msilib.schema import AdvtExecuteSequence
 from tkinter import Image
+from types import MethodType
 
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
@@ -132,6 +134,9 @@ def song_txt(music: Music):
                 except:
                     fileimage = Image.open(os.path.join('src/static/mai/pic/', f"noimage.png"))
                     sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
+    mtype = 'DX 谱面'
+    if music.type == 'SD':
+        mtype = '标准谱面'
     return Message([
         {
             "type": "image",
@@ -142,7 +147,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"♪{music.type} - {music.id}\n"
+                "text": f"♪{music.id} > {mtype}\n"
             }
         },
         {
@@ -237,7 +242,8 @@ mr = on_regex(r".*maimai.*什么")
 
 @mr.handle()
 async def _(bot: Bot, event: Event, state: T_State):
-    await mr.finish(song_txt(total_list.random()))
+    nickname = event.sender.nickname
+    await mr.finish(f'▿ [Sender: {nickname}]\n  打什么歌? 来打这个:\n' + song_txt(total_list.random()))
 
 
 spec_rand_multi = on_regex(r"^随([1-9]\d*)首(?:dx|sd|标准)?[绿黄红紫白]?[0-9]+\+?[至]?([0-9]+\+?)?")
@@ -1036,10 +1042,11 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         payload = {'username': username}
         platenum = 0
+    await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n正在查询此账户的 Best 40，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum)
     except Exception as e:
-        await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Exception | 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     if success == 400:
         await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Not Found | 找不到 ID\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
@@ -1092,10 +1099,11 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
         platenum = 0
     payload['b50'] = True
+    await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n正在查询此账户的 Best 50，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum)
     except Exception as e:
-        await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Exception | 生成失败\n[Exception Occurred]\n{e}\n请检查查分器是否已正确导入所有乐曲成绩。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     if success == 400:
         await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Not Found | 找不到 ID\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
@@ -1553,12 +1561,18 @@ async def _(bot: Bot, event: Event, state: T_State):
         await plate.send(f'▿ [Sender: {nickname}]\n  Plate - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         song_played = []
+        song_remain_basic = []
+        song_remain_advanced = []
         song_remain_expert = []
         song_remain_master = []
         song_remain_re_master = []
         song_remain_difficult = []
         if res.groups()[1] in ['将', '者']:
             for song in player_data['verlist']:
+                if song['level_index'] == 0 and song['achievements'] < (100.0 if res.groups()[1] == '将' else 80.0):
+                    song_remain_basic.append([song['id'], song['level_index']])
+                if song['level_index'] == 1 and song['achievements'] < (100.0 if res.groups()[1] == '将' else 80.0):
+                    song_remain_advanced.append([song['id'], song['level_index']])
                 if song['level_index'] == 2 and song['achievements'] < (100.0 if res.groups()[1] == '将' else 80.0):
                     song_remain_expert.append([song['id'], song['level_index']])
                 if song['level_index'] == 3 and song['achievements'] < (100.0 if res.groups()[1] == '将' else 80.0):
@@ -1568,6 +1582,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                 song_played.append([song['id'], song['level_index']])
         elif res.groups()[1] in ['極', '极']:
             for song in player_data['verlist']:
+                if song['level_index'] == 0 and not song['fc']:
+                    song_remain_basic.append([song['id'], song['level_index']])
+                if song['level_index'] == 1 and not song['fc']:
+                    song_remain_advanced.append([song['id'], song['level_index']])
                 if song['level_index'] == 2 and not song['fc']:
                     song_remain_expert.append([song['id'], song['level_index']])
                 if song['level_index'] == 3 and not song['fc']:
@@ -1577,6 +1595,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                 song_played.append([song['id'], song['level_index']])
         elif res.groups()[1] == '舞舞':
             for song in player_data['verlist']:
+                if song['level_index'] == 0 and song['fs'] not in ['fsd', 'fsdp']:
+                    song_remain_basic.append([song['id'], song['level_index']])
+                if song['level_index'] == 1 and song['fs'] not in ['fsd', 'fsdp']:
+                    song_remain_advanced.append([song['id'], song['level_index']])
                 if song['level_index'] == 2 and song['fs'] not in ['fsd', 'fsdp']:
                     song_remain_expert.append([song['id'], song['level_index']])
                 if song['level_index'] == 3 and song['fs'] not in ['fsd', 'fsdp']:
@@ -1586,6 +1608,10 @@ async def _(bot: Bot, event: Event, state: T_State):
                 song_played.append([song['id'], song['level_index']])
         elif res.groups()[1] == "神":
             for song in player_data['verlist']:
+                if song['level_index'] == 0 and song['fc'] not in ['ap', 'app']:
+                    song_remain_basic.append([song['id'], song['level_index']])
+                if song['level_index'] == 1 and song['fc'] not in ['ap', 'app']:
+                    song_remain_advanced.append([song['id'], song['level_index']])
                 if song['level_index'] == 2 and song['fc'] not in ['ap', 'app']:
                     song_remain_expert.append([song['id'], song['level_index']])
                 if song['level_index'] == 3 and song['fc'] not in ['ap', 'app']:
@@ -1597,12 +1623,18 @@ async def _(bot: Bot, event: Event, state: T_State):
         for music in total_list:
             if music.version in payload['version']:
                 total_music_num += 1
+                if [int(music.id), 0] not in song_played:
+                    song_remain_basic.append([int(music.id), 2])
+                if [int(music.id), 1] not in song_played:
+                    song_remain_advanced.append([int(music.id), 2])
                 if [int(music.id), 2] not in song_played:
                     song_remain_expert.append([int(music.id), 2])
                 if [int(music.id), 3] not in song_played:
                     song_remain_master.append([int(music.id), 3])
                 if res.groups()[0] in ['舞', '霸'] and len(music.level) == 5 and [int(music.id), 4] not in song_played:
                     song_remain_re_master.append([int(music.id), 4])
+        song_remain_basic = sorted(song_remain_basic, key=lambda i: int(i[0]))
+        song_remain_advanced = sorted(song_remain_advanced, key=lambda i: int(i[0]))
         song_remain_expert = sorted(song_remain_expert, key=lambda i: int(i[0]))
         song_remain_master = sorted(song_remain_master, key=lambda i: int(i[0]))
         song_remain_re_master = sorted(song_remain_re_master, key=lambda i: int(i[0]))
@@ -1613,17 +1645,39 @@ async def _(bot: Bot, event: Event, state: T_State):
                     song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
                 except:
                     song_remain_difficult.append([music.id, music.title, "--", music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+        bsccomplete = 100 - (len(song_remain_basic) / total_music_num * 100)
+        advcomplete = 100 - (len(song_remain_advanced) / total_music_num * 100)
         expcomplete = 100 - (len(song_remain_expert) / total_music_num * 100)
         mascomplete = 100 - (len(song_remain_master) / total_music_num * 100)
-        msg = f'''▾ [Sender: {nickname}]\n  {res.groups()[0]}{res.groups()[1]}当前进度\n{"您" if not res.groups()[2] else res.groups()[2]}的剩余歌曲数量如下：
+        if not res.groups()[0] in ['舞', '霸']:
+            complete = 100 - ((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master)) / (total_music_num * 4) * 100)
+            singlecount = math.ceil((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master)) / 3)
+            teamcount = math.ceil((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master)) / 4)
+        else:
+            complete = 100 - ((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master) + len(song_remain_re_master)) / (total_music_num * 4 + 79) * 100)
+            singlecount = math.ceil((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master) + len(song_remain_re_master)) / 3)
+            teamcount = math.ceil((len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master) + len(song_remain_re_master)) / 4)
+        song_remain = song_remain_expert + song_remain_master + song_remain_re_master
+        msg = f'''▾ [Sender: {nickname}]\n  Nameplate Progress | 铭牌进度\n{"您" if not res.groups()[2] else res.groups()[2]}的{res.groups()[0]}{res.groups()[1]} 进度表如下：
+---------------------
+== 总进度 ==
+已完成 {complete:.2f}%，剩余{len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master) if not res.groups()[0] in ['舞', '霸'] else len(song_remain_basic) + len(song_remain_advanced) + len(song_remain_expert) + len(song_remain_master) + len(song_remain_re_master)} / {total_music_num * 4 if not res.groups()[0] in ['舞', '霸'] else total_music_num * 4 + 79}首
+
+== 各难度进度 ==
+Basic | 已完成 {bsccomplete:.2f}%, 待完成 {len(song_remain_basic)} 首 / 共 {total_music_num} 首
+Advanced | 已完成 {advcomplete:.2f}%, 待完成 {len(song_remain_advanced)} 首 / 共 {total_music_num} 首
 Expert | 已完成 {expcomplete:.2f}%, 待完成 {len(song_remain_expert)} 首 / 共 {total_music_num} 首
 Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 / 共 {total_music_num} 首
 '''
-        song_remain = song_remain_expert + song_remain_master + song_remain_re_master
         song_record = [[s['id'], s['level_index']] for s in player_data['verlist']]
         if res.groups()[0] in ['舞', '霸']:
             remascomplete = 100 - (len(song_remain_re_master) / 79 * 100)
-            msg += f'Re:Master | 已完成 {remascomplete:.2f}%, 待完成 {len(song_remain_re_master)} 首 / 共 79 首\n'
+            msg += f'Re:Master | 已完成 {remascomplete:.2f}%, 待完成 {len(song_remain_re_master)} 首 / 共 79 首 (含后续追加的标准谱，实际上可不打后续追加的白谱)\n'
+        msg += f'''
+== 清谱时长预计 ==
+单刷 | 理想状况下需要约 {singlecount} pc.
+拼机 | 理想状况下需要约 {teamcount} pc.   
+'''
         if len(song_remain_difficult) > 0:
             if len(song_remain_difficult) < 11:
                 if res.groups()[0] in ['真']:
@@ -1632,7 +1686,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                     msg += "\n此功能对应牌子遵循的版本为日版，国行版本中，完成版本 舞萌DX 分类内的歌曲可同时获得熊、华两牌。"
                 elif res.groups()[0] in ['爽'] or res.groups()[0] in ['煌']:
                     msg += "\n此功能对应牌子遵循的版本为日版，国行版本中，完成版本 舞萌DX2021 分类内的歌曲可同时获得熊、华两牌。"
-                msg += '\n剩余重点歌曲（>= 13.7）：\n'
+                msg += '\n== 剩余难点曲目 ==\n'
                 for s in sorted(song_remain_difficult, key=lambda i: i[3]):
                     self_record = ''
                     if [int(s[0]), s[-1]] in song_record:
@@ -1651,7 +1705,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
             else: msg += f'还有 {len(song_remain_difficult)} 个等级是 13+ 及以上的谱面，加油推分吧！\n'
         elif len(song_remain) > 0:
             if len(song_remain) < 11:
-                msg += '\n还有以下剩余重点曲目（>=13.7）：\n'
+                msg += '\n== 剩余难点曲目 ==\n'
                 for s in sorted(song_remain, key=lambda i: i[3]):
                     m = total_list.by_id(str(s[0]))
                     self_record = ''
@@ -1669,9 +1723,9 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                         continue
                     msg += f'Track {m.id} > {m.title} | {diffs[s[1]]}\n定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
             else:
-                msg += f'{res.groups()[0]}{res.groups()[1]} 已确定！当前已经没有大于 13+ 及其以上的谱面了,加油清谱吧！\n'
+                msg += f'恭喜{res.groups()[0]}{res.groups()[1]}确定！已经没有大于 13+ 及其以上的谱面了,加油!!\n'
         else:
-            msg += f'{res.groups()[0]}{res.groups()[1]} 所需的所有歌曲均已达到要求，恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 达成了 {res.groups()[0]}{res.groups()[1]}！'
+            msg += f'关于{res.groups()[0]}{res.groups()[1]}的所有难度的谱面均已达成，恭喜 {"您" if not res.groups()[2] else res.groups()[2]} 成功获得{res.groups()[0]}{res.groups()[1]}！'
             if not res.groups()[2]:
                 if res.groups()[0] == "真":
                     platever = 0
@@ -1725,7 +1779,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                 else:
                     await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
                 await db.commit()
-                msg += '\n您在自主查询 B40 或 B50 时，这个牌子将展现在您的姓名框处。'
+                msg += '\n您在 Kiba 上自主查询 B40 或 B50 时，此铭牌将展现在您的姓名框处。'
         await plate.send(msg.strip())
 
 levelprogress = on_regex(r'^([0-9]+\+?)\s?(.+)进度\s?(.+)?')
@@ -1810,7 +1864,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if len(song_remain) > 0:
             if len(song_remain) < 50:
                 song_record = [[s['id'], s['level_index']] for s in player_data['verlist']]
-                msg += f'▼ [Sender: {nickname}]\n  清谱进度\n以下是 {"您" if not res.groups()[2] else res.groups()[2]} 的 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()} 的剩余曲目：\n'
+                msg += f'▼ [Sender: {nickname}]\n  Level Progress | 清谱进度\n以下是 {"您" if not res.groups()[2] else res.groups()[2]} 的 Lv.{res.groups()[0]} 全谱面 {res.groups()[1].upper()} 的剩余曲目：\n'
                 for s in sorted(songs, key=lambda i: i[3]):
                     self_record = ''
                     if [int(s[0]), s[-1]] in song_record:

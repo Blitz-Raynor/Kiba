@@ -21,6 +21,7 @@
   <ItemGroup>
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="src\ControlTools\restart.bat" />
     <Content Include="src\resource\b30\B30.png" />
     <Content Include="src\resource\b30\Divider.png" />
     <Content Include="src\resource\b30\mask.png" />
@@ -61,7 +62,6 @@
     <Content Include="src\resource\recent\RawV3Bg_1.png" />
     <Content Include="src\static\adobe_simhei.otf" />
     <Content Include="src\static\aliases.csv" />
-    <Content Include="src\static\arcsong.db" />
     <Content Include="src\static\career_data.json" />
     <Content Include="src\static\high_eq_image.png" />
     <Content Include="src\static\HOS.ttf" />
@@ -69,9 +69,7 @@
     <Content Include="src\static\HOS_Med.ttf" />
     <Content Include="src\static\Kiba.db" />
     <Content Include="src\static\msyh.ttc" />
-    <Content Include="src\static\static.7z.001" />
-    <Content Include="src\static\static.7z.002" />
-    <Content Include="src\static\static.exe" />
+    <Content Include="src\static\static.zip" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\arcaea\api\request.py" />
@@ -114,6 +112,7 @@
     <Compile Include="src\arcaea\schema\v5\user_info.py" />
     <Compile Include="src\arcaea\schema\v5\__init__.py" />
     <Compile Include="src\arcaea\schema\__init__.py" />
+    <Compile Include="src\ControlTools\tools.py" />
     <Compile Include="src\libraries\arcapi.py" />
     <Compile Include="src\libraries\arcdraw.py" />
     <Compile Include="src\libraries\arcsql.py" />
@@ -136,6 +135,7 @@
     <Compile Include="src\plugins\maimaidx.py" />
     <Compile Include="src\plugins\majsoul.py" />
     <Compile Include="src\plugins\public.py" />
+    <Compile Include="src\plugins\sys.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\arcaea\api\" />
@@ -146,6 +146,7 @@
     <Folder Include="src\arcaea\message\image_message\single_song\" />
     <Folder Include="src\arcaea\message\text_message\" />
     <Folder Include="src\arcaea\" />
+    <Folder Include="src\ControlTools\" />
     <Folder Include="src\resource\" />
     <Folder Include="src\resource\b30\" />
     <Folder Include="src\resource\diff\" />

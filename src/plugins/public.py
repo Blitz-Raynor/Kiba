@@ -31,7 +31,10 @@ helper = on_command('help', aliases={'about'})
 @helper.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     pic_dir = 'src/static/mai/pic/'
-    about_str =  f"版本代号: Kiba 2022\n版本号: 4.2 (4.200.2211080115)\n----------------------\nGithub:\nhttps://github.com/KilluaSakata/Kiba\nProject Kiba Credits:\n@Killua Sakata\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX/Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede\n\n▾ Getting Started | 上手帮助\n查询 Maimai DX 模块帮助: maimai.help\n查询 跑团/COC 模块帮助: coc.help\n查询 Arcaea 模块 (Beta) 帮助: arc help\n查询 其它功能/漂流社区 帮助: public.help\n查询 群管理模块 帮助: admin.help"
+    codename = 'Kiba 2023 Ready'
+    version = 4.3
+    debugver = '4.300.2211242107'
+    about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\n----------------------\nGithub:\nhttps://github.com/KilluaSakata/Kiba\nProject Kiba Credits:\n@Killua Sakata\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX/Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede\n\n▾ Getting Started | 上手帮助\n查询 Maimai DX 模块帮助: maimai.help\n查询 跑团/COC 模块帮助: coc.help\n查询 Arcaea 模块 (Beta) 帮助: arc help\n查询 其它功能/漂流社区 帮助: public.help\n查询 群管理模块 帮助: admin.help"
     image = Image.open(os.path.join(pic_dir, 'KibaAbout.jpg')).convert('RGBA')
     await helper.send(Message([{"type": "image","data":{"file": f"base64://{str(image_to_base64(image), encoding='utf-8')}"}},{"type": "text","data":{"text": about_str}}]))
    
@@ -212,7 +215,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r == 5:
-        await poke.send(Message('呜呜呜...不要再戳啦...'))
+        await poke.send(Message('你有尝试玩过歌曲B.M.S.吗？'))
     elif r <= 7 and r > 5:
         await poke.send(Message([{
             "type": "image",
@@ -228,7 +231,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             }
         }]))
     elif r <= 17 and r > 12:
-        await poke.send(Message(f'好的....大家请各位戳刚刚戳我的那位。'))
+        await poke.send(Message(f'哦我的上帝，看这里，我找到了一位超级无聊的人。'))
     elif r <= 19 and r > 17:
         t = random.randint(60,90)
         try:
@@ -236,9 +239,9 @@ async def _(bot: Bot, event: Event, state: T_State):
             await poke.send(f'别戳了！！烟你{t}秒冷静一下。')
         except Exception as e:
             print(e)
-            await poke.send(Message('一天到晚就知道戳戳戳，你不许戳了！(╬▔皿▔)╯'))
+            await poke.send(Message('一天到晚就知道戳戳戳，戳自己肚皮不行吗？'))
     elif r == 1:
-        await poke.send(Message('一天到晚就知道戳戳戳，戳自己肚皮不行吗？'))
+        await poke.send(Message('你不许再戳了！'))
     else:
         await poke.send(Message([{
             "type": "poke",
@@ -484,13 +487,24 @@ select = on_command("帮选", aliases={"帮我选"})
 async def _(bot: Bot, event: Event, state: T_State):
     nickname = event.sender.nickname
     argv = str(event.get_message()).strip().split(" ")
+    xnmb = random.randint(0,20)
     if len(argv) == 1:
         await select.finish("▿ 帮选 - 参数不足\n选你🐎。")
         return
     elif len(argv) is not None:
-        result = random.randint(0, len(argv) - 1)
-        await select.finish(f"▾ 帮选\n我选 {argv[result]}。")
-        return
+        if xnmb == 1:
+            await select.finish("▾ 帮选\n选你🐎，自己选去。")
+            return
+        elif xnmb >= 16 and xnmb <= 18:
+            await select.finish("▾ 帮选\n我都不选。")
+            return
+        elif xnmb > 18:
+            await select.finish("▾ 帮选\n小孩子才做选择，成年人我都要。")
+            return
+        else:
+            result = random.randint(0, len(argv) - 1)
+            await select.finish(f"▾ 帮选\n我选 {argv[result]}。")
+            return
     else:
         await select.finish("▿ 帮选 - 无参数\n选你🐎。")
         return

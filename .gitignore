@@ -4,3 +4,4 @@ src/static
 venv
 __pycache__
 /env
+src/plugins/EditThings.py

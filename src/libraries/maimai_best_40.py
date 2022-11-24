@@ -349,41 +349,20 @@ class DrawBest(object):
             if int(chartInfo.idNum) < 10000 and chartInfo.tp == 'DX':
                 trackid = str(int(trackid) + 10000)
             if int(trackid) >= 10000:
-                tempDraw.text((117, 8), f'D{trackid}', 'white', idfont)
+                tempDraw.text((114, 8), f'ID {trackid}', 'white', idfont)
             else:
-                tempDraw.text((125, 8), f'S{trackid}', 'white', idfont)
+                tempDraw.text((114, 8), f'ID {trackid}', 'white', idfont)
             title = chartInfo.title
             if self._coloumWidth(title) > 14:
                 title = self._changeColumnWidth(title, 13) + '...'
             tempDraw.text((8, 30), title, 'white', font)
             font = ImageFont.truetype('src/static/HOS.ttf', 13, encoding='utf-8')
-            tempDraw.text((8, 50), f'Achievement Rate', 'white', font)
+            tempDraw.text((8, 50), f'Achv. Rate:', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 26, encoding='utf-8')
             tempDraw.text((8, 62), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
-            if rankPic[chartInfo.scoreId] == 'SSSp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (163, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (168, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SSp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (171, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (175, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'Sp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (181, 43), rankImg.split()[3])
-            else:
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (185, 43), rankImg.split()[3])
+            rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+            rankImg = self._resizePic(rankImg, 0.8)
+            temp.paste(rankImg, (156, 40), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.6)
@@ -405,7 +384,7 @@ class DrawBest(object):
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 16, encoding='utf-8')
             tempDraw.text((8, 108), f'{chartInfo.ds}', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 16, encoding='utf-8')
-            tempDraw.text((51, 102), f'→', 'white', font)
+            tempDraw.text((51, 102), f'>', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 25, encoding='utf-8')
             tempDraw.text((74, 95), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
             if num >= 9:
@@ -469,41 +448,20 @@ class DrawBest(object):
             if int(chartInfo.idNum) < 10000 and chartInfo.tp == 'DX':
                 trackid = str(int(trackid) + 10000)
             if int(trackid) >= 10000:
-                tempDraw.text((117, 8), f'D{trackid}', 'white', idfont)
+                tempDraw.text((114, 8), f'ID {trackid}', 'white', idfont)
             else:
-                tempDraw.text((125, 8), f'S{trackid}', 'white', idfont)
+                tempDraw.text((114, 8), f'ID {trackid}', 'white', idfont)
             title = chartInfo.title
             if self._coloumWidth(title) > 14:
                 title = self._changeColumnWidth(title, 13) + '...'
             tempDraw.text((8, 30), title, 'white', font)
             font = ImageFont.truetype('src/static/HOS.ttf', 13, encoding='utf-8')
-            tempDraw.text((8, 50), f'Achievement Rate', 'white', font)
+            tempDraw.text((8, 50), f'Achv. Rate:', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 26, encoding='utf-8')
             tempDraw.text((8, 62), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
-            if rankPic[chartInfo.scoreId] == 'SSSp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (163, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SSS' or rankPic[chartInfo.scoreId] == 'AAA' or rankPic[chartInfo.scoreId] == 'BBB':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (168, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SSp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (171, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'SS' or rankPic[chartInfo.scoreId] == 'AA' or rankPic[chartInfo.scoreId] == 'BB':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (175, 43), rankImg.split()[3])
-            elif rankPic[chartInfo.scoreId] == 'Sp':
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (181, 43), rankImg.split()[3])
-            else:
-                rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
-                rankImg = self._resizePic(rankImg, 0.8)
-                temp.paste(rankImg, (185, 43), rankImg.split()[3])
+            rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
+            rankImg = self._resizePic(rankImg, 0.8)
+            temp.paste(rankImg, (156, 40), rankImg.split()[3])
             if chartInfo.comboId:
                 comboImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_{comboPic[chartInfo.comboId]}_S.png')).convert('RGBA')
                 comboImg = self._resizePic(comboImg, 0.6)
@@ -525,7 +483,7 @@ class DrawBest(object):
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 16, encoding='utf-8')
             tempDraw.text((8, 108), f'{chartInfo.ds}', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 16, encoding='utf-8')
-            tempDraw.text((51, 102), f'→', 'white', font)
+            tempDraw.text((51, 102), f'>', 'white', font)
             font = ImageFont.truetype('src/static/HOS_Med.ttf', 25, encoding='utf-8')
             tempDraw.text((74, 95), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'white', font)
             if num >= 9:
@@ -575,10 +533,6 @@ class DrawBest(object):
         drawObject.rectangle((x, y + r / 2, x + w, y + h - (r / 2)), fill=color)
 
     def draw(self):
-        topImg = Image.open(os.path.join(self.pic_dir, 'top.png')).convert('RGBA')
-        self.img.paste(topImg, (0, 0), mask=topImg.split()[3])
-        underImg = Image.open(os.path.join(self.pic_dir, 'under.png')).convert('RGBA')
-        self.img.paste(underImg, (0, 810 if not self.b50 else 1110), mask=underImg.split()[3])
         groundImg = Image.open(os.path.join(self.pic_dir, 'ground.png')).convert('RGBA')
         self.img.paste(groundImg, (0, 0), mask=groundImg.split()[3])
         self.img.paste(groundImg, (0, 622), mask=groundImg.split()[3])
@@ -586,7 +540,11 @@ class DrawBest(object):
         leftImg = Image.open(os.path.join(self.pic_dir, 'left.png')).convert('RGBA')
         self.img.paste(leftImg, (0, 0), mask=leftImg.split()[3])
         rightImg = Image.open(os.path.join(self.pic_dir, 'right.png')).convert('RGBA')
-        self.img.paste(rightImg, (738, 780 if not self.b50 else 1080), mask=rightImg.split()[3])
+        self.img.paste(rightImg, (1266, 0), mask=rightImg.split()[3])
+        topImg = Image.open(os.path.join(self.pic_dir, 'top.png')).convert('RGBA')
+        self.img.paste(topImg, (0, 0), mask=topImg.split()[3])
+        underImg = Image.open(os.path.join(self.pic_dir, 'under.png')).convert('RGBA')
+        self.img.paste(underImg, (0, 1203 if not self.b50 else 1503), mask=underImg.split()[3])
 
         if self.qqId:
             if self.platenum == 0:
@@ -631,7 +589,7 @@ class DrawBest(object):
         font2 = ImageFont.truetype('src/static/HOS.ttf', 14, encoding='utf-8')
         font2s = ImageFont.truetype('src/static/HOS.ttf', 13, encoding='utf-8')
         font3 = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
-        playCountInfo = f'Rank: {self.rankRating} | Rating: {self.musicRating}' if not self.b50 else f'Best 50 Rating'
+        playCountInfo = f'段位: {self.rankRating} | 底分: {self.musicRating}' if not self.b50 else f'Best 50 底分模式'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
         textPos = ((shougouImgW - playCountInfoW - font2.getoffset(playCountInfo)[0]) / 2, 5)
@@ -699,7 +657,8 @@ def computeRa(ds: float, achievement: float, spp: bool = False) -> int:
 
 
 async def get_player_data(payload: Dict):
-    async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/player", json=payload) as resp:
+    conn = aiohttp.TCPConnector(verify_ssl=False)
+    async with aiohttp.request("POST", "https://www.diving-fish.com/api/maimaidxprober/query/player", connector=conn, json=payload) as resp:
         if resp.status == 400:
             return None, 400
         elif resp.status == 403:

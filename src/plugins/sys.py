@@ -1,8 +1,16 @@
+from ast import If
+from http.client import FAILED_DEPENDENCY
+from io import SEEK_END
+from pdb import Restart
 from nonebot import on_command
 from nonebot.permission import SUPERUSER
-from nonebot.adapters import Event, Bot
+from nonebot.adapters.cqhttp import Message, Event, Bot
 import platform
 import time
+from nonebot.rule import to_me
+from src.libraries.config import Config
+from src.ControlTools.tools import restart
+
 using_distro = False
 try:
     import distro
@@ -15,7 +23,6 @@ start = time.time()
 start = int(start)
 
 systeminfo = on_command("systeminfo", aliases={"系统状态", "ping", "Ping"} ,priority=5)
-
 @systeminfo.handle()
 async def _(bot: Bot, event: Event):
     python_version = platform.python_version()
@@ -28,17 +35,60 @@ async def _(bot: Bot, event: Event):
     release = platform.release()
     m, s = divmod((int(time.time()) - start), 60)
     h, m = divmod(m, 60)
-    result = "▾ 系统状态\n"
+    result = "▾ Pong! | 系统状态\n"
     flag = False
     if using_distro == True:
         flag = True
         if distro.name() == "" and distro.version() == "":
             flag = False
     if flag == False:
-        result += "系统类型：" + system + "\n系统版本号：" + release + "\n系统架构：" + arch[0] + "\n处理器信息：" + processor + "\n设备名：" + node + "\n系统版本：" + platform_version + "\nPython 版本：" + python_version + "\nPython 构建时间：" + build_time[1] + "\nKiba 运行时间：" + str(h) + "h " + str(m) + "min " + str(s) + "s"
+        result += "系统类型: " + system + "\n系统版本号: " + release + "\n系统架构: " + arch[0] + "\n处理器信息: " + processor + "\n设备名: " + node + "\n系统版本: " + platform_version + "\nPython 版本: " + python_version + "\nPython 构建时间: " + build_time[1] + "\nKiba 运行时间: " + str(h) + "h " + str(m) + "min " + str(s) + "s"
         await systeminfo.send(result)
     elif flag == True:
         distro_name = distro.name()
         distro_version = distro.version()
-        result += "系统类型：" + system + "\n系统版本号：" + release + "\n系统架构：" + arch[0] + "\n处理器信息：" + processor + "\n设备名：" + node + "\nLinux 发行版：" + distro_name + "\nLinux 发行版版本：" + distro_version + "\nPython 版本：" + python_version + "\nPython 构建时间：" + build_time[1] + "\nBot 运行时间：" + str(h) + "h " + str(m) + "min " + str(s) + "s"
+        result += "系统类型: " + system + "\n系统版本号: " + release + "\n系统架构: " + arch[0] + "\n处理器信息: " + processor + "\n设备名: " + node + "\nLinux 发行版: " + distro_name + "\nLinux 发行版版本: " + distro_version + "\nPython 版本: " + python_version + "\nPython 构建时间: " + build_time[1] + "\nKiba 运行时间: " + str(h) + "h " + str(m) + "min " + str(s) + "s"
         await systeminfo.send(result)
+
+
+restartbot = on_command("restart", aliases={"重启", "重新启动", "reset"} ,rule=to_me() ,priority=5)
+@restartbot.handle()
+async def _(bot: Bot, event: Event):
+    if str(event.user_id) not in Config.superuser:
+        await restartbot.send("您还不是 Kiba 的管理员，无法重新启动 Kiba。请联系管理员。")
+        return
+    else:
+        flag = False
+        if using_distro == True:
+            flag = True
+            if distro.name() == "" and distro.version() == "":
+                flag = False
+        if flag == False:
+            await restartbot.send("正在重新启动 Kiba Server......\n请稍候，重启操作需要1-3分钟。")
+            restart()
+        else:
+            await restartbot.send("重启命令当前只支持 Windows 版本。请您手动登录服务器以重新启动。")
+
+
+sendmsg = on_command("sendmsg", aliases={"send", "群发"} ,rule=to_me() ,priority=5)
+@sendmsg.handle()
+async def _(bot: Bot, event: Event):
+    if str(event.user_id) not in Config.superuser:
+        await sendmsg.send("您还不是 Kiba 的管理员，无法给所有参与的群发送通知。请联系管理员。")
+        return
+    else:
+        msg = str(event.get_message()).strip()
+        await sendmsg.send("正在群发此通知消息，请稍候......\n为了防止风控，每 10 秒发送一个群。")
+        send = '▾ Kiba 管理员的群发消息:\n' + msg
+        group_list = await bot.get_group_list()
+        complete = 0
+        failed = 0
+        for group in group_list:
+            time.sleep(10)
+            try:
+                await sendmsg.send(group_id=group['group_id'],message=send)
+                complete += 1
+            except:
+                failed += 1
+                continue
+        await sendmsg.send(f"群发完成。共发送成功 {complete} 个群，发送失败 {failed} 个群。")

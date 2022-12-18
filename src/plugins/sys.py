@@ -10,6 +10,8 @@ import time
 from nonebot.rule import to_me
 from src.libraries.config import Config
 from src.ControlTools.tools import restart
+from nonebot.typing import T_State
+from src.libraries.image import image_to_base64, text_to_image
 
 using_distro = False
 try:
@@ -17,6 +19,33 @@ try:
     using_distro = True
 except ImportError:
     pass
+
+sys_help = on_command('sys.help')
+@sys_help.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    help_str = '''▼ 系统设置帮助 | Commands For Kiba System
+------------------------------------------------------------------------------------------------------------------------------
+以下设置，除显示系统状态外，都需要操作者的身份是群管理或者是 Kiba 管理员时这些操作才会执行。
+部分高权限、高风险操作只有发送者的身份是 Kiba 管理员才可以执行，这些命令将在这里以[*]标注。
+
+警告: 操作以[!]标注的这些设置会直接影响 Kiba 的稳定性，严禁随意使用。发生严重后果的， KibaBot 会将操
+作者所在群退出并拉黑操作者。 若操作者为 Kiba 管理员，取消其管理权限。
+
+这些操作，除系统状态外，都需要 @Kiba 才会执行。
+
+[ ][ ] 系统状态 / ping              --  显示 Kiba 当前的系统状态。
+
+[!][*] restart / 重启              --  在不重启计算机的情况下，重启 Kiba 服务。
+注: 切勿很短时间内重启多次，会影响服务。
+
+[!][*] 群发 / send              --  向 Kiba 所在的所有群发送消息，您不得使用此命令发送有害信息。
+------------------------------------------------------------------------------------------------------------------------------'''
+    await sys_help.send(Message([{
+        "type": "image",
+        "data": {
+            "file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"
+        }
+    }]))
 
 
 start = time.time()

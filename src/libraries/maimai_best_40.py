@@ -195,56 +195,56 @@ class DrawBest(object):
         return f'UI_PFC_MS_Info02_{pic}.png' 
 
     def rank (self)-> str:
-        ranker = '初学者'
+        ranker = '00'
         if self.rankRating == 250:
-            ranker = '实习生'
+            ranker = '00'
         elif self.rankRating == 500:
-            ranker = '初出茅庐'
+            ranker = '00'
         elif self.rankRating == 750:
-            ranker = '修行中'
+            ranker = '00'
         elif self.rankRating == 1000:
-            ranker = '初段'
+            ranker = '01'
         elif self.rankRating == 1200:
-            ranker = '二段'
+            ranker = '02'
         elif self.rankRating == 1400:
-            ranker = '三段'
+            ranker = '03'
         elif self.rankRating == 1500:
-            ranker = '四段'
+            ranker = '04'
         elif self.rankRating == 1600:
-            ranker = '五段'
+            ranker = '05'
         elif self.rankRating == 1700:
-            ranker = '六段'
+            ranker = '06'
         elif self.rankRating == 1800:
-            ranker = '七段'
+            ranker = '07'
         elif self.rankRating == 1850:
-            ranker = '八段'
+            ranker = '08'
         elif self.rankRating == 1900:
-            ranker = '九段'
+            ranker = '09'
         elif self.rankRating == 1950:
-            ranker = '十段'
+            ranker = '10'
         elif self.rankRating == 2000:
-            ranker = '真传'
+            ranker = '11'
         elif self.rankRating == 2010:
-            ranker = '真传壹段'
+            ranker = '12'
         elif self.rankRating == 2020:
-            ranker = '真传贰段'
+            ranker = '13'
         elif self.rankRating == 2030:
-            ranker = '真传叁段'
+            ranker = '14'
         elif self.rankRating == 2040:
-            ranker = '真传肆段'
+            ranker = '15'
         elif self.rankRating == 2050:
-            ranker = '真传伍段'
+            ranker = '16'
         elif self.rankRating == 2060:
-            ranker = '真传陆段'
+            ranker = '17'
         elif self.rankRating == 2070:
-            ranker = '真传柒段'
+            ranker = '18'
         elif self.rankRating == 2080:
-            ranker = '真传捌段'
+            ranker = '19'
         elif self.rankRating == 2090:
-            ranker = '真传玖段'
+            ranker = '20'
         elif self.rankRating == 2100:
-            ranker = '真传拾段'
-        return ranker
+            ranker = '21'
+        return f'UI_CMN_DaniPlate_{ranker}.png'
 
     def _findRaPic(self) -> str:
         num = '10'
@@ -329,8 +329,10 @@ class DrawBest(object):
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0]) 
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
-            temp = temp.filter(ImageFilter.GaussianBlur(3))
+            temp = temp.filter(ImageFilter.GaussianBlur(2))
             temp = temp.point(lambda p: p * 0.72)
+            mbImg = Image.open(os.path.join(self.pic_dir, f'mb.png')).convert('RGBA')
+            temp.paste(mbImg, (0, 0), mbImg.split()[3])
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.8)
@@ -406,8 +408,8 @@ class DrawBest(object):
             temp = Image.open(os.path.join(self.cover_dir, f'1000.png')).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
-            temp = temp.filter(ImageFilter.GaussianBlur(1))
             temp = self.circle_corner(temp, 15)
+            temp = temp.filter(ImageFilter.GaussianBlur(2))
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
             recBase = self.set_trans(recBase)
@@ -427,9 +429,10 @@ class DrawBest(object):
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
-            temp = temp.filter(ImageFilter.GaussianBlur(3))
+            temp = temp.filter(ImageFilter.GaussianBlur(2))
             temp = temp.point(lambda p: p * 0.72)
-
+            mbImg = Image.open(os.path.join(self.pic_dir, f'mbdx.png')).convert('RGBA')
+            temp.paste(mbImg, (0, 0), mbImg.split()[3])
             tempDraw = ImageDraw.Draw(temp)
             diffImg = Image.open(os.path.join(self.pic_dir, self.diffpic(chartInfo.diff))).convert('RGBA')
             diffImg = self._resizePic(diffImg, 0.8)
@@ -509,8 +512,8 @@ class DrawBest(object):
             temp = Image.open(os.path.join(self.cover_dir, f'1000.png')).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
-            temp = temp.filter(ImageFilter.GaussianBlur(1))
             temp = self.circle_corner(temp, 15)
+            temp = temp.filter(ImageFilter.GaussianBlur(2))
             recBase = Image.new('RGBA', (itemW, itemH), 'black')
             recBase = recBase.point(lambda p: p * 0.8)
             recBase = self.set_trans(recBase)
@@ -533,19 +536,6 @@ class DrawBest(object):
         drawObject.rectangle((x, y + r / 2, x + w, y + h - (r / 2)), fill=color)
 
     def draw(self):
-        groundImg = Image.open(os.path.join(self.pic_dir, 'ground.png')).convert('RGBA')
-        self.img.paste(groundImg, (0, 0), mask=groundImg.split()[3])
-        self.img.paste(groundImg, (0, 622), mask=groundImg.split()[3])
-        self.img.paste(groundImg, (0, 1244), mask=groundImg.split()[3])
-        leftImg = Image.open(os.path.join(self.pic_dir, 'left.png')).convert('RGBA')
-        self.img.paste(leftImg, (0, 0), mask=leftImg.split()[3])
-        rightImg = Image.open(os.path.join(self.pic_dir, 'right.png')).convert('RGBA')
-        self.img.paste(rightImg, (1266, 0), mask=rightImg.split()[3])
-        topImg = Image.open(os.path.join(self.pic_dir, 'top.png')).convert('RGBA')
-        self.img.paste(topImg, (0, 0), mask=topImg.split()[3])
-        underImg = Image.open(os.path.join(self.pic_dir, 'under.png')).convert('RGBA')
-        self.img.paste(underImg, (0, 1203 if not self.b50 else 1503), mask=underImg.split()[3])
-
         if self.qqId:
             if self.platenum == 0:
                 plateImg = Image.open(os.path.join(self.pic_dir, 'none.png')).convert('RGBA')
@@ -573,7 +563,9 @@ class DrawBest(object):
         ratingBaseImg = self._drawRating(ratingBaseImg)
         ratingBaseImg = self._resizePic(ratingBaseImg, 0.8)
         self.img.paste(ratingBaseImg, (240 if not self.qqId else 139, 10), mask=ratingBaseImg.split()[3])
-
+        daniplateImg = Image.open(os.path.join(self.pic_dir, self.rank())).convert('RGBA')
+        daniplateImg = self._resizePic(daniplateImg, 0.65)
+        self.img.paste(daniplateImg, (390 if not self.qqId else 289, 8), mask=daniplateImg.split()[3])
         namePlateImg = Image.open(os.path.join(self.pic_dir, 'UI_TST_PlateMask.png')).convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)
@@ -587,8 +579,9 @@ class DrawBest(object):
         shougouImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_Shougou_Rainbow.png')).convert('RGBA')
         shougouDraw = ImageDraw.Draw(shougouImg)
         font2 = ImageFont.truetype('src/static/HOS.ttf', 14, encoding='utf-8')
-        font2s = ImageFont.truetype('src/static/HOS.ttf', 13, encoding='utf-8')
-        font3 = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
+        font2s = ImageFont.truetype('src/static/HOS.ttf', 26, encoding='utf-8')
+        font3 = ImageFont.truetype('src/static/HOS_Med.ttf', 48, encoding='utf-8')
+        font4 = ImageFont.truetype('src/static/HOS_Med.ttf', 14, encoding='utf-8')
         playCountInfo = f'段位: {self.rankRating} | 底分: {self.musicRating}' if not self.b50 else f'Best 50 底分模式'
         shougouImgW, shougouImgH = shougouImg.size
         playCountInfoW, playCountInfoH = shougouDraw.textsize(playCountInfo, font2)
@@ -601,6 +594,18 @@ class DrawBest(object):
         splashImg = self._resizePic(splashImg, 0.2)
         self.img.paste(splashImg, (685, 2), mask=splashImg.split()[3])
 
+        ratingImg = Image.open(os.path.join(self.pic_dir, 'Rating.png')).convert('RGBA')
+        ratingDraw = ImageDraw.Draw(ratingImg)
+        font = ImageFont.truetype('src/static/HOS.ttf', 32, encoding='utf-8')
+        try:
+            ratingDraw.text((26, 62), f'{self.sdBest[0].ra if not self.b50 else computeRa(self.sdBest[0].ds, self.sdBest[0].achievement, True)}','black', font)
+            ratingDraw.text((299, 62), f'{self.sdBest[int(len(self.sdBest)-1)].ra if not self.b50 else computeRa(self.sdBest[int(len(self.sdBest))-1].ds, self.sdBest[int(len(self.sdBest))-1].achievement, True)}', 'black', font)
+            ratingDraw.text((662, 62), f'{self.dxBest[0].ra if not self.b50 else computeRa(self.dxBest[0].ds, self.dxBest[0].achievement, True)}', 'black', font)
+            ratingDraw.text((1005, 62), f'{self.dxBest[int(len(self.dxBest)-1)].ra if not self.b50 else computeRa(self.dxBest[int(len(self.dxBest))-1].ds, self.dxBest[int(len(self.dxBest))-1].achievement, True)}', 'black', font)
+        except:
+            ratingDraw.text((26, 130), f'在您打满 Best 40/50 后，该信息将会全部展示。加油！','black', font4)
+        self.img.paste(ratingImg, (6, 1360 if not self.b50 else 1660), mask=ratingImg.split()[3])
+
         self._drawBestList(self.img, self.sdBest, self.dxBest)
         total_sd = 0
         total_dx = 0
@@ -609,10 +614,10 @@ class DrawBest(object):
         for i in range(len(self.dxBest)):
             total_dx += self.dxBest[i].ra if not self.b50 else computeRa(self.dxBest[i].ds, self.dxBest[i].achievement, True)
         authorBoardImg = Image.open(os.path.join(self.pic_dir, 'UI_CMN_MiniDialog_01.png')).convert('RGBA')
-        authorBoardImg = self._resizePic(authorBoardImg, 0.45)
         authorBoardDraw = ImageDraw.Draw(authorBoardImg)
-        mode = "B25" if not self.b50 else "B35"
-        authorBoardDraw.text((19, 21), f' {mode}: {total_sd}     B15: {total_dx}\n Rank Level: {self.rank()}\n  --------------------------------\n Credits: Xyb & Diving-Fish\n Designer: Killua', 'black', font2s)
+        authorBoardDraw.text((82 if not self.b50 else 75, 144), f'{total_sd}', 'black', font3)
+        authorBoardDraw.text((320 if not self.b50 else 313, 144), f'{total_dx}', 'black', font3)
+        authorBoardImg = self._resizePic(authorBoardImg, 0.45)
         self.img.paste(authorBoardImg, (1070, 10), mask=authorBoardImg.split()[3])
         dxImg = Image.open(os.path.join(self.pic_dir, 'UI_RSL_MBase_Parts_01.png')).convert('RGBA')
         dxImg = self._resizePic(dxImg, 0.5)

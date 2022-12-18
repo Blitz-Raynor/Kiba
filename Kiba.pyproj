@@ -11,7 +11,8 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>MSBuild|Kiba Env|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>
+    </InterpreterId>
     <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
@@ -114,9 +115,6 @@
     <Compile Include="src\arcaea\schema\v5\__init__.py" />
     <Compile Include="src\arcaea\schema\__init__.py" />
     <Compile Include="src\ControlTools\tools.py" />
-    <Compile Include="src\libraries\arcapi.py" />
-    <Compile Include="src\libraries\arcdraw.py" />
-    <Compile Include="src\libraries\arcsql.py" />
     <Compile Include="src\libraries\config.py" />
     <Compile Include="src\libraries\gosen_choyen.py" />
     <Compile Include="src\libraries\image.py" />
@@ -127,6 +125,7 @@
     <Compile Include="src\libraries\maimai_plate.py" />
     <Compile Include="src\libraries\tool.py" />
     <Compile Include="src\plugins\arcaea.py" />
+    <Compile Include="src\plugins\playercounting.py" />
     <Compile Include="src\plugins\coc.py" />
     <Compile Include="src\plugins\database.py" />
     <Compile Include="src\plugins\EditThings.py" />
@@ -135,6 +134,7 @@
     <Compile Include="src\plugins\image.py" />
     <Compile Include="src\plugins\maimaidx.py" />
     <Compile Include="src\plugins\majsoul.py" />
+    <Compile Include="src\plugins\community.py" />
     <Compile Include="src\plugins\public.py" />
     <Compile Include="src\plugins\sys.py" />
   </ItemGroup>
@@ -161,17 +161,6 @@
     <Folder Include="src\libraries" />
     <Folder Include="src\plugins" />
     <Folder Include="src\static\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Interpreter Include="Kiba Env\">
-      <Id>Kiba Env</Id>
-      <Version>3.9</Version>
-      <Description>Kiba Env (Python 3.9 (64-bit))</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-      <Architecture>X64</Architecture>
-    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

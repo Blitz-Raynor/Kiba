@@ -73,10 +73,6 @@ jrrp/人品值                                                                  
 
 b40 / b50                                                                              根据查分器数据生成你的 Best 40 /Best 50。
 
-[@我]<出勤店铺><人数/几>人                                             设置或者显示当前店铺的出勤人数
-
-[@我]<出勤店铺>位置                                                           显示店铺的位置
-
 段位模式 <Expert/Master> <初级/中级/上级/超上级>        模拟Splash Plus的随机段位模式。
                                                                                             详情请输入“段位模式 帮助”查看
 
@@ -102,9 +98,7 @@ setplate                                                                        
 
 ▼ 管理员设置 | Administrative                                             
 ------------------------------------------------------------------------------------------------------------------------------
-店铺设置 <店铺名> <店铺位置（可选）>
-
-猜歌设置 <启用/禁用>
+猜歌设置 <启用/禁用>   -- 此命令设置猜歌是否启用。
 ------------------------------------------------------------------------------------------------------------------------------'''
     await help_mai.send(Message([{
         "type": "image",
@@ -380,7 +374,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             try:
                 tag = stats['tag']
             except:
-                tag = "Insufficient Difficulty Data"
+                tag = "Insufficient"
             try:
                 file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
                 imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
@@ -404,65 +398,110 @@ async def _(bot: Bot, event: Event, state: T_State):
             fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
             fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 28, encoding='utf-8')
             fontLV = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
-            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 12, encoding='utf-8')
+            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 26, encoding='utf-8')
             imageDraw = ImageDraw.Draw(baseimage);
             if len(chart['notes']) == 4:
                 imagestandard = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
                 imagestandard = imagestandard.resize((int(imagestandard.size[0] * 0.8), int(imagestandard.size[1] * 0.8)))
                 baseimage.paste(imagestandard, (480,26), mask=imagestandard.split()[3])
-                imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
+                imageDraw.text((63, 630), f'{music["id"]}', 'black', fontBold)
                 if coloumWidth(music["title"]) > 30:
                     title = changeColumnWidth(music["title"], 20) + '...'
                     imageDraw.text((33, 680), title, 'black', fontBoldL)
                 else:
                     imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
                 if str(level).rfind("+") == -1:
-                    imageDraw.text((513, 635), f'{level}', 'white', fontLV)
+                    imageDraw.text((513, 635), f'{level}', 'black', fontLV)
                 else:
-                    imageDraw.text((505, 635), f'{level}', 'white', fontLV)
-                imageDraw.text((523, 690), f'{ds}', (0, 162, 232), fontBoldLV)
+                    imageDraw.text((505, 635), f'{level}', 'black', fontLV)
+                imageDraw.text((355, 840), f'{ds}', 'black', fontBoldLV)
                 imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
-                imageDraw.text((35, 831), f'{tag}', 'black', font)
-                imageDraw.text((35, 930), f'{chart["charter"]}', 'black', font)
+                imageDraw.text((40, 835), f'{tag}', 'black', font)
+                imageDraw.text((40, 920), f'{chart["charter"]}', 'black', font)
                 tap = chart['notes'][0]
                 hold = chart['notes'][1]
                 slide = chart['notes'][2]
                 breaknote = chart['notes'][3]
-                imageDraw.text((68, 1092), f'{tap}', 'white', fontLV)
-                imageDraw.text((236, 1092), f'{slide}', 'white', fontLV)
-                imageDraw.text((433, 1092), f'--', 'white', fontLV)
-                imageDraw.text((68, 1215), f'{hold}', 'white', fontLV)
-                imageDraw.text((236, 1215), f'{breaknote}', 'white', fontLV)
-                imageDraw.text((433, 1215), f'{tap + slide + hold + breaknote}', 'white', fontLV)
+                if int(tap) >= 100:
+                    imageDraw.text((41, 1100), f'{tap}', 'white', fontLV)
+                elif int(tap) < 100 and int(tap) >= 10:
+                    imageDraw.text((49, 1100), f'{tap}', 'white', fontLV)
+                else:
+                    imageDraw.text((57, 1100), f'{tap}', 'white', fontLV)
+                if int(slide) >= 100:
+                    imageDraw.text((273, 1100), f'{slide}', 'white', fontLV)
+                elif int(slide) < 100 and int(slide) >= 10:
+                    imageDraw.text((281, 1100), f'{slide}', 'white', fontLV)
+                else:
+                    imageDraw.text((289, 1100), f'{slide}', 'white', fontLV)
+                imageDraw.text((398, 1100), f'--', 'white', fontLV)
+                if int(hold) >= 100:
+                    imageDraw.text((153, 1100), f'{hold}', 'white', fontLV)
+                elif int(hold) < 100 and int(hold) >= 10:
+                    imageDraw.text((164, 1100), f'{hold}', 'white', fontLV)
+                else:
+                    imageDraw.text((172, 1100), f'{hold}', 'white', fontLV)
+                if int(breaknote) >= 100:
+                    imageDraw.text((502, 1100), f'{breaknote}', 'white', fontLV)
+                elif int(breaknote) < 100 and int(breaknote) >= 10:
+                    imageDraw.text((510, 1100), f'{breaknote}', 'white', fontLV)
+                else:
+                    imageDraw.text((518, 1100), f'{breaknote}', 'white', fontLV)
+                imageDraw.text((355, 927), f'{tap + slide + hold + breaknote}', 'black', fontBoldLV)
             else:
                 imagedx = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
                 imagedx = imagedx.resize((int(imagedx.size[0] * 0.8), int(imagedx.size[1] * 0.8)))
                 baseimage.paste(imagedx, (480,26), mask=imagedx.split()[3])
-                imageDraw.text((63, 630), f'{music["id"]}', 'white', fontBold)
+                imageDraw.text((63, 630), f'{music["id"]}', 'black', fontBold)
                 if coloumWidth(music["title"]) > 30:
                     title = changeColumnWidth(music["title"], 20) + '...'
                     imageDraw.text((33, 680), title, 'black', fontBoldL)
                 else:
                     imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
                 if str(level).rfind("+") == -1:
-                    imageDraw.text((513, 635), f'{level}', 'white', fontLV)
+                    imageDraw.text((513, 635), f'{level}', 'black', fontLV)
                 else:
-                    imageDraw.text((501, 635), f'{level}', 'white', fontLV)
-                imageDraw.text((523, 690), f'{ds}', (0, 162, 232), fontBoldLV)
+                    imageDraw.text((501, 635), f'{level}', 'black', fontLV)
+                imageDraw.text((355, 840), f'{ds}', 'black', fontBoldLV)
                 imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
-                imageDraw.text((35, 831), f'{tag}', 'black', font)
-                imageDraw.text((35, 930), f'{chart["charter"]}', 'black', font)
+                imageDraw.text((40, 835), f'{tag}', 'black', font)
+                imageDraw.text((40, 920), f'{chart["charter"]}', 'black', font)
                 tap = chart['notes'][0]
                 hold = chart['notes'][1]
                 slide = chart['notes'][2]
                 touch = chart['notes'][3]
                 breaknote = chart['notes'][4]
-                imageDraw.text((68, 1092), f'{tap}', 'white', fontLV)
-                imageDraw.text((236, 1092), f'{slide}', 'white', fontLV)
-                imageDraw.text((433, 1092), f'{touch}', 'white', fontLV)
-                imageDraw.text((68, 1215), f'{hold}', 'white', fontLV)
-                imageDraw.text((236, 1215), f'{breaknote}', 'white', fontLV)
-                imageDraw.text((433, 1215), f'{tap + slide + hold + breaknote + touch}', 'white', fontLV)
+                if int(tap) >= 100:
+                    imageDraw.text((41, 1100), f'{tap}', 'white', fontLV)
+                elif int(tap) < 100 and int(tap) >= 10:
+                    imageDraw.text((49, 1100), f'{tap}', 'white', fontLV)
+                else:
+                    imageDraw.text((57, 1100), f'{tap}', 'white', fontLV)
+                if int(slide) >= 100:
+                    imageDraw.text((273, 1100), f'{slide}', 'white', fontLV)
+                elif int(slide) < 100 and int(slide) >= 10:
+                    imageDraw.text((281, 1100), f'{slide}', 'white', fontLV)
+                else:
+                    imageDraw.text((289, 1100), f'{slide}', 'white', fontLV)
+                if int(touch) >= 100:
+                    imageDraw.text((387, 1100), f'{touch}', 'white', fontLV)
+                elif int(touch) < 100 and int(touch) >= 10:
+                    imageDraw.text((395, 1100), f'{touch}', 'white', fontLV)
+                else:
+                    imageDraw.text((403, 1100), f'{touch}', 'white', fontLV)
+                if int(hold) >= 100:
+                    imageDraw.text((153, 1100), f'{hold}', 'white', fontLV)
+                elif int(hold) < 100 and int(hold) >= 10:
+                    imageDraw.text((164, 1100), f'{hold}', 'white', fontLV)
+                else:
+                    imageDraw.text((172, 1100), f'{hold}', 'white', fontLV)
+                if int(breaknote) >= 100:
+                    imageDraw.text((502, 1100), f'{breaknote}', 'white', fontLV)
+                elif int(breaknote) < 100 and int(breaknote) >= 10:
+                    imageDraw.text((510, 1100), f'{breaknote}', 'white', fontLV)
+                else:
+                    imageDraw.text((518, 1100), f'{breaknote}', 'white', fontLV)
+                imageDraw.text((355, 927), f'{tap + slide + hold + breaknote + touch}', 'black', fontBoldLV)
             await query_chart.send(Message([
                 {
                     "type": "text",
@@ -507,7 +546,7 @@ async def _(bot: Bot, event: Event, state: T_State):
             fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
             fontTools = ImageFont.truetype('src/static/adobe_simhei.otf', 20, encoding='utf-8')
             imageDraw = ImageDraw.Draw(baseimage);
-            imageDraw.text((70, 618), f'{music["id"]}', 'white', fontBold)
+            imageDraw.text((70, 618), f'{music["id"]}', 'black', fontBold)
             if coloumWidth(music["title"]) > 30:
                 title = changeColumnWidth(music["title"], 20) + '...'
                 imageDraw.text((33, 660), title, 'black', fontBoldL)
@@ -518,10 +557,10 @@ async def _(bot: Bot, event: Event, state: T_State):
             else:
                 imageDraw.text((508, 637), f' {music["basic_info"]["bpm"]}', 'black', fontLV)
             imageDraw.text((37, 705), f'{music["basic_info"]["artist"]}', 'black', font)
-            imageDraw.text((44, 810), f'{music["basic_info"]["genre"]}', 'black', font)
+            imageDraw.text((44, 820), f'{music["basic_info"]["genre"]}', 'black', font)
             imageDraw.text((44, 903), f'{music["basic_info"]["from"]}', 'black', font)
-            imageDraw.text((56, 1088), f'{"  -  ".join(music["level"])}', 'white', fontLV)
-            imageDraw.text((56, 1205), f'{" - ".join(str(music["ds"]).split(","))}', 'white', fontBoldLV)
+            imageDraw.text((50, 1065), f'{"  -  ".join(music["level"])}', 'black', fontLV)
+            imageDraw.text((50, 1170), f'{" - ".join(str(music["ds"]).split(","))}', 'black', fontBoldLV)
             file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
             await query_chart.send(Message([
                 {
@@ -1042,12 +1081,13 @@ async def _(bot: Bot, event: Event, state: T_State):
     else:
         payload = {'username': username}
         platenum = 0
-    await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n正在查询此账户的 Best 40，这需要大概 1-3 分钟。')
+    waitingline = ['正在查询此账户的 Best 40', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急']
+    await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n{waitingline[random.randint(0,5)]}，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum)
     except Exception as e:
         await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
-        return
+        raise e
     if success == 400:
         await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Not Found | 找不到 ID\n此玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
@@ -1099,12 +1139,13 @@ async def _(bot: Bot, event: Event, state: T_State):
         payload = {'username': username}
         platenum = 0
     payload['b50'] = True
-    await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n正在查询此账户的 Best 50，这需要大概 1-3 分钟。')
+    waitingline = ['正在查询此账户的 Best 50', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急']
+    await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n{waitingline[random.randint(0,5)]}，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum)
     except Exception as e:
         await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
-        return
+        raise e
     if success == 400:
         await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Not Found | 找不到 ID\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
     elif success == 403:
@@ -1276,118 +1317,6 @@ async def _(bot: Bot, event: Event, state: T_State):
                 MessageSegment.reply(event.message_id),
                 MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n" + "使用 id 命令可以查看歌曲详情。"),
             ]))
-waiting_set = on_command("设置店铺")
-@waiting_set.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    argv = str(event.get_message()).strip().split(" ")
-    db = get_driver().config.db
-    now = datetime.datetime.now()
-    c = await db.cursor()
-    if event.message_type != "group":
-        await waiting_set.finish("▿ 出勤大数据 - 设置\n抱歉，群管理员/小犽管理者才有权调整店铺设置，请在群内再试一次。")
-        return
-    arg = str(event.get_message())
-    group_members = await bot.get_group_member_list(group_id=event.group_id)
-    for m in group_members:
-        if m['user_id'] == event.user_id:
-            break
-    su = Config.superuser
-    if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await waiting_set.finish("▿ 出勤大数据 - 设置\n抱歉，只有群管理员/小犽管理者才有权调整店铺设置。")
-        return
-    if len(argv) > 2 or argv[0] == "帮助":
-        await waiting_set.finish("▾ 出勤大数据 - 帮助\n命令格式是:\n设置店铺 [店铺名] [店铺位置]\n注意只有管理员才可以有权设置店铺信息哦。")
-        return
-    time = f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}"
-    await c.execute(f'select * from waiting_table where shop="{argv[0]}"')
-    data = await c.fetchone()
-    if data is None:
-        if len(argv) == 2:
-            await c.execute(f'insert into waiting_table values ("{argv[0]}","{argv[1]}",0,"{time}")')
-            await db.commit()
-        elif len(argv) == 1:
-            await c.execute(f'insert into waiting_table values ("{argv[0]}","待设置",0,"{time}")')
-            await db.commit()
-        await waiting_set.finish(f"▾ 出勤大数据\n已成功设置店铺。\n店铺名: {argv[0]}\n出勤人数: 0\n修改时间: {time}")
-    else:
-        if len(argv) == 1:
-            await waiting_set.finish("▿ 出勤大数据 - 设置\n已存在此店铺，您可以选择修改店铺位置信息。")
-            return
-        elif len(argv) == 2:
-            await c.execute(f'update waiting_table set location={argv[1]} where shop={argv[0]}')
-            await waiting_set.finish(f"▾ 出勤大数据\n已成功设置店铺。\n店铺名: {argv[0]}\n出勤人数: 0\n修改时间: {time}")
-            await db.commit()
-
-waiting = on_regex(r'(.+) ([0-9]?几?\+?\-?1?)人?', rule=to_me(), priority=18)
-@waiting.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    regex = "(.+) ([0-9]?几?\+?\-?1?)人?"
-    res = re.match(regex, str(event.get_message()).lower())
-    db = get_driver().config.db
-    now = datetime.datetime.now()
-    c = await db.cursor()
-    time = f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}"
-    if res.groups()[1] == "几":
-        await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
-        data = await c.fetchone()
-        if data is None:
-            await waiting.finish("▿ 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
-            return
-        else:
-            await waiting.finish(f"▾ 出勤大数据\n{data[0]} 有 {data[2]} 人出勤。最后更新时间:{data[3]}")
-            return
-    elif res.groups()[1] == "+1":
-        await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
-        data = await c.fetchone()
-        if data is None:
-            await waiting.finish("▿ 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
-            return
-        else:
-            await c.execute(f'update waiting_table set wait={data[2] + 1}, updated="{time}" where shop="{res.groups()[0]}"')
-            await db.commit()
-            await waiting.finish(f"▾ 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] + 1} 人出勤。最后更新时间:{time}")
-            return
-    elif res.groups()[1] == "-1":
-        await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
-        data = await c.fetchone()
-        if data is None:
-            await waiting.finish("▿ 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
-            return
-        else:
-            if data[2] - 1 < 0:
-                await waiting.finish("▿ 出勤大数据\n不能再减了，再减就变成灵异事件了！")
-                return
-            await c.execute(f'update waiting_table set wait={data[2] - 1}, updated="{time}" where shop="{res.groups()[0]}"')
-            await db.commit()
-            await waiting.finish(f"▾ 出勤大数据\n更新完成！\n{data[0]} 有 {data[2] - 1} 人出勤。最后更新时间:{time}")
-            return
-    else:
-        await c.execute(f'select * from waiting_table where shop="{res.groups()[0]}"')
-        data = await c.fetchone()
-        if data is None:
-            await waiting.finish("▿ 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
-            return
-        else:
-            await c.execute(f'update waiting_table set wait={res.groups()[1]}, updated="{time}" where shop="{res.groups()[0]}"')
-            await db.commit()
-            await waiting.finish(f"▾ 出勤大数据\n更新完成！\n{res.groups()[0]} 有 {res.groups()[1]} 人出勤。最后更新时间:{time}")
-            return
-
-location = on_regex(r'.+位置', rule=to_me())
-@location.handle()
-async def _(bot: Bot, event: Event, state: T_State):
-    regex = "(.+)位置"
-    name = re.match(regex, str(event.get_message())).groups()[0].strip().lower()
-    db = get_driver().config.db
-    c = await db.cursor()
-    await c.execute(f'select * from waiting_table where shop="{name}"')
-    data = await c.fetchone()
-    if data is None:
-        await waiting.finish("▿ 出勤大数据\n此店铺不存在，请联系管理员添加此店铺。")
-        return
-    else:
-        await waiting.finish(f"▾ 出勤大数据 - 位置\n{data[0]}: {data[1]}")
-        return
 
 rand_ranking = on_command("段位模式")
 

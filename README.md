@@ -4,7 +4,7 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能音游 BOT
-Version 4.0
+版本 Release_5.0
 <!-- prettier-ignore-end -->
 
 <p align="center">

@@ -38,9 +38,9 @@ about = on_command('about')
 @about.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     pic_dir = 'src/static/mai/pic/'
-    codename = 'Kiba 2023 Ready'
-    version = 4.4
-    debugver = '4.400.2212141224'
+    codename = 'Kiba 2023: Rocket'
+    version = 5.0
+    debugver = '5.0.1_rocket_release_230101'
     about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\nPowered by Killua.\nThe project is using the MIT open source license.\n\n访问项目的 Github:\nhttps://github.com/KilluaSakata/Kiba\n以下是 Kiba 使用到的开源项目，在此向项目开发者表示敬意与感谢:\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n@SEAFHMC (Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede"
     image = Image.open(os.path.join(pic_dir, 'KibaAbout.png')).convert('RGBA')
     await helper.send(Message([{"type": "text","data":{"text": "▾ About Kiba | 关于 Kiba"}}, {"type": "image","data":{"file": f"base64://{str(image_to_base64(image), encoding='utf-8')}"}},{"type": "text","data":{"text": about_str}}]))

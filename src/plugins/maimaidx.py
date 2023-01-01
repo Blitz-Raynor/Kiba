@@ -46,54 +46,52 @@ help_mai = on_command('maimai.help')
 async def _(bot: Bot, event: Event, state: T_State):
     help_str = '''▼ 舞萌模块可用命令 | Commands For Maimai                                               
 ------------------------------------------------------------------------------------------------------------------------------
-今日舞萌/今日运势                                                               查看今天的舞萌运势
+今日舞萌 | 今日运势    ->    查看今天的舞萌运势
 
-XXXmaimaiXXX什么                                                           随机一首歌
+XXXmaimaiXXX什么    ->    随机一首歌
 
-随个[dx/标准][绿黄红紫白]<难度>                                      随机一首指定条件的乐曲
+随个[dx/标准][绿黄红紫白]<难度>    ->    随机一首指定条件的乐曲
 
-随<数量>个[dx/标准][绿黄红紫白]<难度1>                       随机指定首指定条件的乐曲（不超过4个）
-[至]<难度2>                                                                        可以设置两个难度，会从其中随机歌曲
+随<数量>个[dx/标准][绿黄红紫白]<难度1>[至]<难度2>    ->    随机指定首指定条件的乐曲（不超过4个）                                        
+* 可以设置两个难度，会从其中随机歌曲
 
-查歌<乐曲标题的一部分>                                                    查询符合条件的乐曲
+查歌<乐曲标题的一部分>    ->    查询符合条件的乐曲
 
-[绿黄红紫白]id<歌曲编号>                                                  查询乐曲信息或谱面信息
+[绿黄红紫白]id<歌曲编号>    ->    查询乐曲信息或谱面信息
 
-<歌曲别名>是什么歌                                                            查询乐曲别名对应的乐曲
+<歌曲别名>是什么歌    ->    查询乐曲别名对应的乐曲
 
-定数查歌 <定数下限> <定数上限>                                      查询定数对应的乐曲
+定数查歌 <定数下限> <定数上限>    ->    查询定数对应的乐曲
 
-分数线 <难度+歌曲id> <分数线>                                       详情请输入“分数线 帮助”查看
+分数线 <难度+歌曲id> <分数线>    ->    详情请输入“分数线 帮助”查看
 
-jrrp/人品值                                                                           查看今天的人品值。
+jrrp | 人品值    ->    查看今天的人品值。
 
-今日性癖/jrxp                                                                       看看你今天性什么东西捏？
+今日性癖 | jrxp    ->    看看你今天性什么东西捏？
 
-猜歌                                                                                       开始一轮猜歌                                                         
+猜歌    ->    开始一轮猜歌                                                         
 
-b40 / b50                                                                              根据查分器数据生成你的 Best 40 /Best 50。
+b40 | b50    ->    根据查分器数据生成您的或指定账户的 Best 40 / Best 50。
 
-段位模式 <Expert/Master> <初级/中级/上级/超上级>        模拟Splash Plus的随机段位模式。
-                                                                                            详情请输入“段位模式 帮助”查看
+段位模式 <Expert/Master> <初级/中级/上级/超上级>    ->    模拟Splash Plus的随机段位模式。
+* 详情请输入“段位模式 帮助”查看
 
+<牌子名>进度    ->    查询您的查分器，获取对应牌子的完成度。
 
-<牌子名>进度                                                                     查询您的查分器，获取对应牌子的完成度。
+<等级><Rank/Sync/Combo状态>进度    ->    查询您的查分器，获取对应等级的完成度。
+* Rank: S/S+/SS/SS+/SSS/SSS+等    Sync: FS/FS+/FDX/FDX+ Combo: FC/FC+/AP/AP+
 
-                                                                                             查询您的查分器，获取对应等级的完成度。
-<等级><Rank/Sync/Combo状态>进度                             * Rank: S/S+/SS/SS+/SSS/SSS+等
-                                                                                             Sync: FS/FS+/FDX/FDX+ Combo: FC/FC+/AP/AP+
+我要在<等级>上<分值>分    ->    犽的锦囊 - 快速推荐上分歌曲。
 
-我要在<等级>上<分值>分                                                   犽的锦囊 - 快速推荐上分歌曲。
+查看排名 | 查看排行    ->    查看查分器网站 Rating 的 TOP50 排行榜！
 
-查看排名/查看排行                                                               查看查分器网站 Rating 的 TOP50 排行榜！
+底分分析 | rating分析 <用户名>    ->    Best 40 的底分分析
 
-底分分析/rating分析 <用户名>                                           Best 40 的底分分析
+/kiba 早 | /kiba [上午/中午/晚上]好 | 签到    ->    进行一波签到，然后可以得到今天的运势歌曲。                                          
 
-/kiba 早 
-/kiba [上午/中午/晚上]好                                                             进行一波签到，然后可以得到今天的运势歌曲。                                          
-签到
+setplate    ->    更改在您自主查询B40/B50时在姓名框显示的牌子。
 
-setplate                                                                                        更改在您自主查询B40/B50时在姓名框显示的牌子。
+设置称号 | settitle <查分器昵称> <自定义称号>   ->    设置自定义称号。                                                                   
 ------------------------------------------------------------------------------------------------------------------------------
 
 ▼ 管理员设置 | Administrative                                             
@@ -128,9 +126,9 @@ def song_txt(music: Music):
                 except:
                     fileimage = Image.open(os.path.join('src/static/mai/pic/', f"noimage.png"))
                     sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
-    mtype = 'DX 谱面'
+    mtype = 'DX'
     if music.type == 'SD':
-        mtype = '标准谱面'
+        mtype = '标准'
     return Message([
         {
             "type": "image",
@@ -141,7 +139,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"♪{music.id} > {mtype}\n"
+                "text": f"♪ {music.id} | 类型: {mtype}\n"
             }
         },
         {
@@ -153,7 +151,7 @@ def song_txt(music: Music):
         {
             "type": "text",
             "data": {
-                "text": f"\n分类: {music.genre}\n等级: {' ▸ '.join(music.level)}"
+                "text": f"\n__________\n分类: {music.genre}\n等级: {' ▸ '.join(music.level)}"
             }
         }
     ])
@@ -225,7 +223,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         else:
             rand_result = f'▾ [Sender: {nickname}]\n  Rand Track | 随机歌曲\n' + song_txt(music_data.random())
             if level == '15':
-                rand_result += "\n\nPandora:\n" + pandora_list[random.randint(0,7)]
+                rand_result += "\n\n==========\n" + pandora_list[random.randint(0,7)]
         await spec_rand.send(rand_result)
     except Exception as e:
         print(e)
@@ -597,9 +595,9 @@ async def _(bot: Bot, event: Event, state: T_State):
     ]))
 
 
-wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓DX分', '收歌', '理论值', '打东方曲', '打索尼克曲']
+wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓DX分', '收歌', '理论值', '打东方曲', '打索尼克曲', '单推']
 bwm_list_perfect = ['拆机:然后您被机修当场处决', '女装:怎么这么好康！（然后受到了欢迎）', '耍帅:看我耍帅还AP+', '击剑:Alea jacta est!(SSS+)', '打滴蜡熊:看我今天不仅推了分，还收了歌！', '日麻:看我三倍役满!!!你们三家全都起飞!!!', '出勤:不出则已，一出惊人，当场AP，羡煞众人。', '看手元:哦原来是这样！看了手元果真推分了。', '霸机:这么久群友都没来，霸机一整天不是梦！', '打Maipad: Maipad上收歌了，上机也收了。', '唱打: Let the bass kick! ', '抓绝赞: 把把2600，轻松理论值！']
-bwm_list_bad = ['拆机:不仅您被机修当场处决，还被人尽皆知。', '女装:杰哥说你怎么这么好康！让我康康！！！（被堵在卫生间角落）', '耍帅:星星全都粉掉了......', '击剑:Alea jacta est!(指在线下真实击剑)', '打滴蜡熊:滴蜡熊打你。', '日麻:我居然立直放铳....等等..三倍役满??????', '出勤:当场分数暴毙，惊呆众人。', '看手元:手法很神奇，根本学不来。', '霸机:......群友曰:"霸机是吧？踢了！"', '打Maipad: 上机还是不大会......', '唱打: 被路人拍下上传到了某音。', '抓绝赞: 啊啊啊啊啊啊啊捏妈妈的我超！！！ --- 这是绝赞(好)的音效。']
+bwm_list_bad = ['拆机:不仅您被机修当场处决，还被人尽皆知。', '女装:杰哥说你怎么这么好康！让我康康！！！（被堵在卫生间角落）', '耍帅:星星全都粉掉了......', '击剑:Alea jacta est!(指在线下真实击剑)', '打滴蜡熊:滴蜡熊打你。', '日麻:我居然立直放铳....等等..三倍役满??????', '出勤:当场分数暴毙，惊呆众人。', '看手元:手法很神奇，根本学不来。', '霸机:......群友曰:"霸机是吧？踢了！"', '打Maipad: 上机还是不大会......', '唱打: 被路人拍下上传到了某音。', '抓绝赞: 捏麻麻我超！！！ --- 这是绝赞(好)的音效。']
 tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套。', '游玩时注意手指安全。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以再随一次。', '疫情防护，人人有责。游玩结束后请主动佩戴口罩！', '出勤时注意交通安全。', '迪拉熊不断吃绝赞也不要大力敲打他哟。', '热知识：DX理论值是101.0000，但是旧框没有固定的理论值。', '冷知识：每个绝赞 Perfect 等级有 2600/2550/2500，俗称理论/50落/100落。']
 fx_list = ['东', '西', '南', '北']
 play_list = ['1P', '2P', '排队区']
@@ -636,18 +634,18 @@ async def _(bot: Bot, event: Event, state: T_State):
     fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
     fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 48, encoding='utf-8')
     imageDraw = ImageDraw.Draw(baseimage);
-    imageDraw.text((35, 125), f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}", 'black', font)
+    imageDraw.text((48, 125), f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}", 'white', font)
     if luck >= 50:
-        imageDraw.text((962, 228), f"吉", 'white', font1)
+        imageDraw.text((962, 228), f"吉", 'black', font1)
     else:
-        imageDraw.text((962, 228), f"凶", 'white', font1)
+        imageDraw.text((962, 228), f"凶", 'black', font1)
     if dwm_value_1 == dwm_value_2:
-        imageDraw.text((142, 565), f"并无适宜。", 'black', font)
-        imageDraw.text((142, 710), f"也并无忌惮。", 'black', font)
+        imageDraw.text((130, 555), f"并无适宜。", 'white', font)
+        imageDraw.text((130, 705), f"也并无忌惮。", 'white', font)
     else:
-        imageDraw.text((142, 565), f"{bwm_list_perfect[dwm_value_1]}", 'black', font)
-        imageDraw.text((142, 710), f"{bwm_list_bad[dwm_value_2]}", 'black', font)
-    imageDraw.text((170, 880), f"{ap}", 'white', fontLV)
+        imageDraw.text((130, 555), f"{bwm_list_perfect[dwm_value_1]}", 'white', font)
+        imageDraw.text((130, 705), f"{bwm_list_bad[dwm_value_2]}", 'white', font)
+    imageDraw.text((170, 886), f"{ap}", 'white', fontLV)
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i
@@ -683,7 +681,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 newslist += "\n"
             newslist += f'{slist[i]} '
         imageDraw.text((350, 1175), f"{newslist}", 'black', font)
-    imageDraw.text((120, 1443), f"{tips_list[tips_value]}", 'black', fonttips)
+    imageDraw.text((110, 1425), f"{tips_list[tips_value]}", 'black', fonttips)
     music = total_list[hash(qq) % len(total_list)]
     try:
         file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
@@ -1045,7 +1043,59 @@ async def _(bot: Bot, event: Event, state: T_State):
         await db.commit()
         await setplate.finish(f"▾ [Sender: {nickname}]\n   Plate Changer | 更换名牌板\n更换完成。")
     
+settitle = on_command('设置称号', aliases={'settitle'})
 
+@settitle.handle()
+async def _(bot: Bot, event: Event, state: T_State):
+    argv = str(event.get_message()).strip().split(" ")
+    nickname = event.sender.nickname
+    dvid = argv[0]
+    title = ''
+    for i in range(0, int(len(argv))):
+        if i == 0:
+            continue
+        else: 
+            title += argv[i]
+            if i == int(len(argv)) - 1:
+                continue
+            if i != int(len(argv)) or i != 1:
+                title += ' '
+            
+    db = get_driver().config.db
+    mt = event.message_type
+    c = await db.cursor()
+    if mt == "guild":
+        await settitle.send(f"▿ [Sender: {nickname}]\n  B40/B50 自定义称号 - 错误\n不可以在频道内用哦。")
+        return
+    payload = {'username': dvid}
+    payload2 = {'qq': str(event.get_user_id())}
+    obj1, success1 = await get_player_data(payload)
+    obj2, success2 = await get_player_data(payload2)
+    if success1 == 400 or success2 == 400:
+        await settitle.send(f"▿ [Sender: {nickname}]\n  B40/B50 自定义称号 - 错误\n您输入的玩家 ID 没有找到。请确认此 ID 是否存在。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        return
+    elif success1 == 403:
+        await settitle.send(f'▿ [Sender: {nickname}]\n  B40/B50 自定义称号 - 被禁止\n{dvid} 设置了隐私权限。请先暂时关闭才能继续称号设置。关闭隐私设置，请使用查分器设置:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        return
+    rating1 = int(obj1["rating"] + obj1["additional_rating"])
+    rating2 = int(obj2["rating"] + obj2["additional_rating"])
+    if rating1 == rating2:
+        if len(title) > 18:
+            await settitle.send(f"▿ [Sender: {nickname}]\n  B40/B50 自定义称号\n自定义称号的长度不允许超过 18 字符，建议您不要超过 12 个汉字。")
+            return
+        else:
+            await c.execute(f'select * from title_table where qq="{str(event.get_user_id())}"')
+            data = await c.fetchone()
+            if data is None:
+                await c.execute(f"insert into title_table values ('{dvid}','{str(event.get_user_id())}','{title}')")
+            else:
+                await c.execute(f"update title_table set title='{title}' where qq='{str(event.get_user_id())}'")
+            await db.commit()
+            await settitle.send(f"▾ [Sender: {nickname}]\n  B40/B50 自定义称号\n您已成功设置了您的 B40/B50 称号！在您自助查询/他人在 Kiba 上查询您的 B40/B50 时，此称号会展示在称号栏上。")
+            return
+    else:
+        await settitle.send(f"▿ [Sender: {nickname}]\n  B40/B50 自定义称号\n经检查，您的QQ号码与此查分器账户所绑定的号码不一致。请检查您的设置后再试。")
+        return
 
 best_40_pic = on_command('b40', aliases={'B40'})
 @best_40_pic.handle()
@@ -1070,6 +1120,12 @@ async def _(bot: Bot, event: Event, state: T_State):
                     platenum = 0
                 else:
                     platenum = str(data1[1])
+                await c.execute(f'select * from title_table where qq="{str(data[0])}"')
+                data2 = await c.fetchone()
+                if data2 is None:
+                    title = 0
+                else:
+                    title = str(data2[2])
         else:
             payload = {'qq': str(event.get_user_id())}
             await c.execute(f'select * from plate_table where id="{str(event.get_user_id())}"')
@@ -1078,13 +1134,25 @@ async def _(bot: Bot, event: Event, state: T_State):
                 platenum = 0
             else:
                 platenum = str(data1[1])
+            await c.execute(f'select * from title_table where qq="{str(event.get_user_id())}"')
+            data2 = await c.fetchone()
+            if data2 is None:
+               title = 0
+            else:
+               title = str(data2[2])
     else:
         payload = {'username': username}
+        await c.execute(f'select * from title_table where id="{username}"')
+        data2 = await c.fetchone()
+        if data2 is None:
+            title = 0
+        else:
+            title = str(data2[2])
         platenum = 0
-    waitingline = ['正在查询此账户的 Best 40', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急']
-    await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n{waitingline[random.randint(0,5)]}，这需要大概 1-3 分钟。')
+    waitingline = ['正在查询此账户的 Best 40', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '阿犽不小心吃了华莱士......等一下', '正在描绘船新版本的B40', '稍微等一下嗷']
+    await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Generating B40 | 正在生成\n{waitingline[random.randint(0,8)]}，这需要大概 1-3 分钟。')
     try:
-        img, success = await generate(payload, platenum)
+        img, success = await generate(payload, platenum, title)
     except Exception as e:
         await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         raise e
@@ -1127,6 +1195,12 @@ async def _(bot: Bot, event: Event, state: T_State):
                     platenum = 0
                 else:
                     platenum = str(data1[1])
+                await c.execute(f'select * from title_table where qq="{str(data[0])}"')
+                data2 = await c.fetchone()
+                if data2 is None:
+                    title = 0
+                else:
+                    title = str(data2[2])
         else:
             payload = {'qq': str(event.get_user_id())}
             await c.execute(f'select * from plate_table where id="{str(event.get_user_id())}"')
@@ -1135,14 +1209,26 @@ async def _(bot: Bot, event: Event, state: T_State):
                 platenum = 0
             else:
                 platenum = str(data1[1])
+            await c.execute(f'select * from title_table where qq="{str(event.get_user_id())}"')
+            data2 = await c.fetchone()
+            if data2 is None:
+               title = 0
+            else:
+               title = str(data2[2])
     else:
         payload = {'username': username}
+        await c.execute(f'select * from title_table where id="{username}"')
+        data2 = await c.fetchone()
+        if data2 is None:
+            title = 0
+        else:
+            title = str(data2[2])
         platenum = 0
     payload['b50'] = True
-    waitingline = ['正在查询此账户的 Best 50', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急']
-    await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Please Wait... | 请稍候\n{waitingline[random.randint(0,5)]}，这需要大概 1-3 分钟。')
+    waitingline = ['正在查询此账户的 Best 50', '正在绘制此账户的成分', '先让犽楞一会神', '联系服务器还需要一段时间捏', '犽正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '阿犽不小心吃了华莱士......等一下', '正在描绘船新版本的B50', '稍微等一下嗷']
+    await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Generating B50 | 正在生成\n{waitingline[random.randint(0,8)]}，这需要大概 1-3 分钟。')
     try:
-        img, success = await generate(payload, platenum)
+        img, success = await generate(payload, platenum, title)
     except Exception as e:
         await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Exception | 出错\n[Exception Occurred]\n{e}\n可能是技术原因或您的账户配置有误。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         raise e
@@ -1753,7 +1839,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await levelprogress.send(f"▿ [Sender: {nickname}]\n  等级清谱查询 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await levelprogress.send(f'▿ [Sender: {nickname}]\n  等级清谱查询 - 被禁止\n{username} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await levelprogress.send(f'▿ [Sender: {nickname}]\n  等级清谱查询 - 被禁止\n{res.groups()[2].strip()} 不允许使用此方式查询牌子进度。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         song_played = []
@@ -1821,7 +1907,7 @@ rankph = on_command('查看排行', aliases={'查看排名'})
 async def _(bot: Bot, event: Event, state: T_State):
     async with aiohttp.request("GET", "https://www.diving-fish.com/api/maimaidxprober/rating_ranking") as resp:
         rank_data = await resp.json()
-        msg = f'▾ Rating TOP50 排行榜\n截止 {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}，Diving-Fish 查分器网站已注册用户 Rating 排行：\n'
+        msg = f'▼ Rating TOP50 排行榜\n截止 {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}，Diving-Fish 查分器网站已注册用户 Rating 排行：\n'
         for i, ranker in enumerate(sorted(rank_data, key=lambda r: r['ra'], reverse=True)[:50]):
             msg += f'TOP {i + 1}> {ranker["username"]}  DX Rating:{ranker["ra"]}\n'
         await rankph.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))
@@ -1865,7 +1951,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         await rise_score.send(f"▿ [Sender: {nickname}]\n  犽的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await rise_score.send(f'▿ [Sender: {nickname}]\n  犽的锦囊 - 被禁止\n{username} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await rise_score.send(f'▿ [Sender: {nickname}]\n  犽的锦囊 - 被禁止\n{res.groups()[2].strip()} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         dx_ra_lowest = 999
@@ -2276,59 +2362,59 @@ async def _(bot: Bot, event: Event, state: T_State):
             msg += f"----------------------\nB25> #1: {sd_best_max_sc}  #25: {sd_best_min_sc} \nB15> #1: {dx_best_max_sc}  #15: {dx_best_min_sc} \n----------------------"
             msg += f"\nType | SSS+ | SSS | SS+ | SS\n[B25]\n#1 | {max_sssp}   {max_sss}   {max_ssp}   {max_ss}\n"
             msg += f"#25 | {min_sssp}   {min_sss}   {min_ssp}   {min_ss}\n[B15]\n#1 | {max_sssp_dx}   {max_sss_dx}   {max_ssp_dx}   {max_ss_dx}\n#15 | {min_sssp_dx}   {min_sss_dx}   {min_ssp_dx}   {min_ss_dx}\n"
-            msg += f"----------------------\n{name}的历史歌曲中：\n#1 的 Rating 相当于达成"
+            msg += f"----------------------\n{name}的历史歌曲中：\n天花板相当于达成"
             if max_sssp != "":
-                msg += f" {max_sssp} 的 SSS+"
+                msg += f" {max_sssp}的SSS+"
             if max_sss != "":
-                msg += f"、{max_sss} 的 SSS"
+                msg += f"、{max_sss}的SSS"
             if max_ssp != "":
-                msg += f"、{max_ssp} 的 SS+"
+                msg += f"、{max_ssp}的SS+"
             if max_ss != "":
-                msg += f"、{max_ss} 的 SS"
+                msg += f"、{max_ss}的SS"
             if max_sp != "":
-                msg += f"、{max_sp} 的 S+"
+                msg += f"、{max_sp}的S+"
             if max_s != "":
-                msg += f"、{max_s} 的 S"
-            msg += "可获得的 Rating；\n#25 的 Rating 相当于达成"
+                msg += f"、{max_s}的S"
+            msg += "可获得的 Rating；\n地板相当于达成"
             if min_sssp != "":
-                msg += f" {min_sssp} 的 SSS+"
+                msg += f" {min_sssp}的SSS+"
             if min_sss != "":
-                msg += f"、{min_sss} 的 SSS"
+                msg += f"、{min_sss}的SSS"
             if min_ssp != "":
-                msg += f"、{min_ssp} 的 SS+"
+                msg += f"、{min_ssp}的SS+"
             if min_ss != "":
-                msg += f"、{min_ss} 的 SS"
+                msg += f"、{min_ss}的SS"
             if min_sp != "":
-                msg += f"、{min_sp} 的 S+"
+                msg += f"、{min_sp}的S+"
             if min_s != "":
-                msg += f"、{min_s} 的 S"
-            msg += f"可获得的 Rating。\n{name}的当前大版本歌曲中：\n#1 的 Rating 相当于达成"
+                msg += f"、{min_s}的S"
+            msg += f"可获得的 Rating。\n{name}的当前大版本歌曲中：\n天花板相当于达成"
             if max_sssp_dx != "":
-                msg += f" {max_sssp_dx} 的 SSS+"
+                msg += f" {max_sssp_dx}的SSS+"
             if max_sss_dx != "":
-                msg += f"、{max_sss_dx} 的 SSS"
+                msg += f"、{max_sss_dx}的SSS"
             if max_ssp_dx != "":
-                msg += f"、{max_ssp_dx} 的 SS+"
+                msg += f"、{max_ssp_dx}的SS+"
             if max_ss_dx != "":
-                msg += f"、{max_ss_dx} 的 SS"
+                msg += f"、{max_ss_dx}的SS"
             if max_sp_dx != "":
-                msg += f"、{max_sp_dx} 的 S+"
+                msg += f"、{max_sp_dx}的S+"
             if max_s_dx != "":
-                msg += f"、{max_s_dx} 的 S"
-            msg += "可获得的 Rating；\n#15 的 Rating 相当于达成"
+                msg += f"、{max_s_dx}的S"
+            msg += "可获得的 Rating；\n地板相当于达成"
             if min_sssp_dx != "":
-                msg += f" {min_sssp_dx} 的 SSS+"
+                msg += f" {min_sssp_dx}的SSS+"
             if min_sss_dx != "":
-                msg += f"、{min_sss_dx} 的 SSS"
+                msg += f"、{min_sss_dx}的SSS"
             if min_ssp_dx != "":
-                msg += f"、{min_ssp_dx} 的 SS+"
+                msg += f"、{min_ssp_dx}的SS+"
             if min_ss_dx != "":
-                msg += f"、{min_ss_dx} 的 SS"
+                msg += f"、{min_ss_dx}的SS"
             if min_sp_dx != "":
-                msg += f"、{min_sp_dx} 的 S+"
+                msg += f"、{min_sp_dx}的S+"
             if min_s_dx != "":
-                msg += f"、{min_s_dx} 的 S"
-            msg += "可获得的 Rating。\n请注意：B15 按照当前大版本的最高等级 (即 15.0) 来表示；如需升分推荐，请移步犽的锦囊。"
+                msg += f"、{min_s_dx}的S"
+            msg += "可获得的 Rating。\n========\nB15 目前按照当前大版本的最高等级 (即 15.0) 来表示，升分推荐请使用犽的锦囊命令。"
             await base.send(msg)
         except Exception as e:
             await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")

@@ -360,7 +360,7 @@ async def _(bot: Bot, event: Event, state: T_State):
         if argv[0].find("CQ:image") != -1:
             message = argv[0].split("[")
             msg = message[0]
-            piclink = message[1][57:].split("]")
+            piclink = message[1].split("url=")[1].split(";is_origin=0")
             await c.execute(f'insert into plp_table values ({plpid},{user},"{nickname}","{msg}|{piclink[0]}",1,0,0)')
             await db.commit()
             await plp_insert.finish(f"▾ [Sender: {nickname}]\n  Kiba Community | 漂流社区: 扔瓶子 - 完成\n您的 图片 漂流瓶(ID: {plpid})已经扔出去啦!\n请注意: 如果您的瓶子包含了 R-18 (包括擦边球）以及任何不应在漂流瓶内出现的内容，您可能会受到 Kiba Community 的部分功能封禁或相应处置。如果需要撤回瓶子，请使用 “删瓶子” 指令。")

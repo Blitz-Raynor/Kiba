@@ -31,9 +31,11 @@ Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为
 
 ## Step 1. 安装 Python
 
-请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。
+请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7 & < 3.10）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。
 
 在 Linux 系统上，可能需要其他方法安装 Python 3，请自行查找。
+
+> 建议您使用 Python 3.9 运行此项目。
 
 ## Step 2. 初步设置
 

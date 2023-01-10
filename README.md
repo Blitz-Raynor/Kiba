@@ -41,6 +41,8 @@ Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为
 
 在运行项目之前，您需要进入`src/static`文件夹，解压以`static`开头的所有 ZIP 压缩文件到`src/static`中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
 
+> 以ZIP压缩的资源文件仅供学习交流使用，请自觉在下载 24 小时内删除资源文件。
+
 在 Windows 10 / Windows Server 2016 以上的系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
 如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`命令提示符(Command Prompt)`，`Windows Powershell`以及`cd`命令的教程。
 

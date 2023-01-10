@@ -3,8 +3,7 @@
 # Kiba 2022
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
-基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能音游 BOT，
-版本 Release_5.0
+基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能音游 BOT。
 <!-- prettier-ignore-end -->
 
 <p align="center">
@@ -13,6 +12,11 @@
   </a>
 
 <div align="left">
+## 警告
+
+使用此项目前，请您确保您下载的源代码为 Release 上提供的代码。
+
+MAIN 分支上的项目有可能正在开发，**不能保证 MAIN 分支的代码可以正常运行**，**运行可能会造成灾难性后果**，建议您下载 Release 的仓库代码。
 
 ## 欢迎使用
 
@@ -34,7 +38,7 @@ Kiba 项目是基于 Mai-Bot 与 Chiyuki 项目融合改造创建的适用于为
 
 建议使用 git 对此项目进行版本管理。您也可以直接在本界面下载代码的压缩包进行运行。
 
-在运行项目之前，您需要进入`src/static`文件夹，解压`static.zip`，到`src/static`中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
+在运行项目之前，您需要进入`src/static`文件夹，解压以`static`开头的所有 ZIP 压缩文件到`src/static`中。在此之后，**您需要打开控制台，并切换到该项目所在的目录。**
 
 在 Windows 10 / Windows Server 2016 以上的系统上，您可以直接在项目的根目录（即 bot.py）文件所在的位置按下 Shift + 右键，点击【在此处打开 PowerShell 窗口】。
 如果您使用的是更旧的操作系统（比如 Windows 7），请自行查找关于`命令提示符(Command Prompt)`，`Windows Powershell`以及`cd`命令的教程。

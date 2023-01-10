@@ -584,7 +584,7 @@ class DrawBest(object):
         self.img.paste(ratingBaseImg, (240 if not self.qqId else 139, 12), mask=ratingBaseImg.split()[3])
         daniplateImg = Image.open(os.path.join(self.pic_dir, self.rank())).convert('RGBA')
         daniplateImg = self._resizePic(daniplateImg, 0.65)
-        self.img.paste(daniplateImg, (405 if not self.qqId else 305, 10), mask=daniplateImg.split()[3])
+        self.img.paste(daniplateImg, (395 if not self.qqId else 295, 9), mask=daniplateImg.split()[3])
         namePlateImg = Image.open(os.path.join(self.pic_dir, 'UI_TST_PlateMask.png')).convert('RGBA')
         namePlateImg = namePlateImg.resize((285, 40))
         namePlateDraw = ImageDraw.Draw(namePlateImg)

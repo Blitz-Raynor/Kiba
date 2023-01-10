@@ -122,6 +122,7 @@
     <Compile Include="src\libraries\maimaidx_guess.py" />
     <Compile Include="src\libraries\maimaidx_music.py" />
     <Compile Include="src\libraries\maimai_best_40.py" />
+    <Compile Include="src\libraries\maimai_pic_generate.py" />
     <Compile Include="src\libraries\maimai_plate.py" />
     <Compile Include="src\libraries\tool.py" />
     <Compile Include="src\plugins\arcaea.py" />

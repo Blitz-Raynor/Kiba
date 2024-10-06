@@ -4,6 +4,7 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Chiyuki & MaiBot 项目开发的 NoneBot 框架的多功能音游 BOT，主要服务 Maimai DX。
+查看Kiba的新框架！https://github.com/Kira-Killua/Kiba-New
 <!-- prettier-ignore-end -->
 
 <p align="center">
